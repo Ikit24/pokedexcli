@@ -5,39 +5,13 @@ import (
     "bufio"
     "os"
     "strings"
+    "log"
+    "io"
+    "net/http"
 )
-
-type cliCommand struct {
-	name        string
-	description string
-	callback    func() error
-}
-
 
 func startRepl() {
     usr_input := bufio.NewScanner(os.Stdin)
-
-    commands := map[string]cliCommand{}
-
-    commandHelp := func() error {
-        fmt.Println("Welcome to the Pokedex!\nUsage:")
-        for name, cmd := range commands {
-            fmt.Printf("%s: %s\n", name, cmd.description)
-        }
-        return nil
-    }
-
-    commands["help"] = cliCommand{
-            name:           "help",
-            description:    "Displays a help message",
-            callback:       commandHelp,
-    }
-    commands["exit"] = cliCommand{
-            name:           "exit",
-            description:    "Exit the Pokedex",
-            callback:       commandExit,
-    }
-
 
     for {
         fmt.Print("Pokedex > ")
@@ -48,18 +22,19 @@ func startRepl() {
         }
         commandName := words[0]
 
-        cmd, ok := commands[commandName]
+        cmd, ok := getCommands()[commandName]
         if ok {
             err := cmd.callback()
             if err != nil {
                 fmt.Println(err)
             }
+            continue
         } else {
             fmt.Println("Unknown command")
+            continue
         }
     }
 }
-
 
 func cleanInput(text string) []string {
     output := strings.ToLower(text)
@@ -67,9 +42,23 @@ func cleanInput(text string) []string {
     return words
 }
 
+type cliCommand struct {
+	name        string
+	description string
+	callback    func() error
+}
 
-func commandExit() error {
-    fmt.Println("Closing the Pokedex... Goodbye!")
-    os.Exit(0)
-    return nil
+func getCommands() map[string]cliCommand {
+    return map[string]cliCommand{
+        "help": {
+            name:        "help",
+            description: "Displays a help message",
+            callback:    commandHelp,
+        },
+        "exit": {
+            name:        "exit",
+            description: "Exit the Pokedex",
+            callback:    commandExit,
+        },
+    }
 }
