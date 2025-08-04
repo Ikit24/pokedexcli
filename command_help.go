@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-func commandHelp() error {
+func commandHelp(cfg *config) error {
 	fmt.Println("Welcome to the Pokedex!\nUsage:")
-	for name, cmd := range commands {
+	for name, cmd := range cfg.MyMap {
 		fmt.Printf("%s: %s\n", name, cmd.description)
 	}
 	return nil

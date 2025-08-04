@@ -5,16 +5,20 @@ import (
     "bufio"
     "os"
     "strings"
-    "log"
-    "io"
-    "net/http"
 )
 
 func startRepl() {
     usr_input := bufio.NewScanner(os.Stdin)
 
+    var cfg config
+
+    cfg.Next = "https://pokeapi.co/api/v2/location-area/"
+    cfg.Previous = ""
+
+    cfg.MyMap = getCommands(&cfg)
+
     for {
-        fmt.Print("Pokedex > ")
+        fmt.Println("Pokedex > ")
         usr_input.Scan()
         words := cleanInput(usr_input.Text())
         if len(words) == 0 {
@@ -22,9 +26,9 @@ func startRepl() {
         }
         commandName := words[0]
 
-        cmd, ok := getCommands()[commandName]
+        cmd, ok := cfg.MyMap[commandName]
         if ok {
-            err := cmd.callback()
+            err := cmd.callback(&cfg)
             if err != nil {
                 fmt.Println(err)
             }
@@ -34,6 +38,7 @@ func startRepl() {
             continue
         }
     }
+
 }
 
 func cleanInput(text string) []string {
@@ -45,10 +50,10 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
-func getCommands() map[string]cliCommand {
+func getCommands(cfg *config) map[string]cliCommand {
     return map[string]cliCommand{
         "help": {
             name:        "help",
@@ -60,5 +65,21 @@ func getCommands() map[string]cliCommand {
             description: "Exit the Pokedex",
             callback:    commandExit,
         },
+        "map": {
+            name:        "map",
+            description: "Displays the current 20 entries",
+            callback:    commandMap,
+        },
+        "mapb": {
+            name:        "mapb",
+            description: "Displays the previous 20 entries",
+            callback:    commandMapb,
+        },
     }
+}
+
+type config struct {
+    Next     string
+    Previous string
+    MyMap map[string]cliCommand
 }
