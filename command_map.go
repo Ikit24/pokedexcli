@@ -9,15 +9,27 @@ import (
 )
 
 func commandMap(cfg *config) error {
-	res, err := http.Get(cfg.Next)
-	if err != nil {
-		return err
-	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
+	var body []byte
+	var err error
 
-	if res.StatusCode > 299 {
-		return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+	cachedData, ok := cfg.Cache.Get(cfg.Next)
+	if !ok {
+		res, httpErr := http.Get(cfg.Next)
+		if httpErr != nil {
+			return httpErr
+		}
+		defer res.Body.Close()
+		body, err = io.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+		cfg.Cache.Add(cfg.Next, body)
+		if res.StatusCode > 299 {
+			return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+		}
+	} else {
+		body = cachedData
+		err = nil
 	}
 
 	var apiResponse pokeapi.LocationAreasResponse
@@ -31,6 +43,12 @@ func commandMap(cfg *config) error {
 		cfg.Previous = ""
 	} else {
 		cfg.Previous = *apiResponse.Previous
+	}
+
+	if apiResponse.Next == "" {
+		cfg.Next = ""
+	} else {
+		cfg.Next = apiResponse.Next
 	}
 
 	for _, result := range apiResponse.Results {
@@ -44,16 +62,27 @@ func commandMapb(cfg *config) error {
 		fmt.Println("you're on the first page")
 		return nil
 	}
+	var body []byte
+	var err error
 
-	res, err := http.Get(cfg.Previous)
-	if err != nil {
-		return err
-	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-
-	if res.StatusCode > 299 {
-		return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+	cachedData, ok := cfg.Cache.Get(cfg.Next)
+	if !ok {
+		res, httpErr := http.Get(cfg.Next)
+		if httpErr != nil {
+			return httpErr
+		}
+		defer res.Body.Close()
+		body, err = io.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+		cfg.Cache.Add(cfg.Next, body)
+		if res.StatusCode > 299 {
+			return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+		}
+	} else {
+		body = cachedData
+		err = nil
 	}
 
 	var apiResponse pokeapi.LocationAreasResponse
@@ -67,6 +96,12 @@ func commandMapb(cfg *config) error {
 		cfg.Previous = ""
 	} else {
 		cfg.Previous = *apiResponse.Previous
+	}
+
+	if apiResponse.Next == "" {
+		cfg.Next = ""
+	} else {
+		cfg.Next = apiResponse.Next
 	}
 
 	for _, result := range apiResponse.Results {

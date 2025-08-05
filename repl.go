@@ -5,6 +5,8 @@ import (
     "bufio"
     "os"
     "strings"
+    "github.com/Ikit24/pokedexcli/internal/pokecache"
+    "time"
 )
 
 func startRepl() {
@@ -14,6 +16,8 @@ func startRepl() {
 
     cfg.Next = "https://pokeapi.co/api/v2/location-area/"
     cfg.Previous = ""
+
+    cfg.Cache = pokecache.NewCache(5 * time.Second)
 
     cfg.MyMap = getCommands(&cfg)
 
@@ -79,7 +83,8 @@ func getCommands(cfg *config) map[string]cliCommand {
 }
 
 type config struct {
-    Next     string
-    Previous string
-    MyMap map[string]cliCommand
+    Next        string
+    Previous    string
+    MyMap       map[string]cliCommand
+    Cache       pokecache.Cache
 }
