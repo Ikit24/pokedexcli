@@ -8,7 +8,7 @@ import (
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
 )
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, _ []string) error {
 	var body []byte
 	var err error
 
@@ -57,7 +57,7 @@ func commandMap(cfg *config) error {
 	return nil
 	}
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, _ []string) error {
 	if cfg.Previous == "" {
 		fmt.Println("you're on the first page")
 		return nil

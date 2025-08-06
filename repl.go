@@ -32,7 +32,7 @@ func startRepl() {
 
         cmd, ok := cfg.MyMap[commandName]
         if ok {
-            err := cmd.callback(&cfg)
+            err := cmd.callback(&cfg, words[1:])
             if err != nil {
                 fmt.Println(err)
             }
@@ -42,7 +42,6 @@ func startRepl() {
             continue
         }
     }
-
 }
 
 func cleanInput(text string) []string {
@@ -54,7 +53,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, []string) error
 }
 
 func getCommands(cfg *config) map[string]cliCommand {
@@ -78,6 +77,11 @@ func getCommands(cfg *config) map[string]cliCommand {
             name:        "mapb",
             description: "Displays the previous 20 entries",
             callback:    commandMapb,
+        },
+        "explore": {
+            name:        "explore",
+            description: "Displays pokemons in the current area",
+            callback:    commandExplore,
         },
     }
 }
