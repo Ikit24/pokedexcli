@@ -17,7 +17,7 @@ func startRepl() {
     cfg.Next = "https://pokeapi.co/api/v2/location-area/"
     cfg.Previous = ""
 
-    cfg.Cache = pokecache.NewCache(5 * time.Second)
+    cfg.Cache = pokecache.NewCache(1 * time.Minute)
 
     cfg.MyMap = getCommands(&cfg)
 
