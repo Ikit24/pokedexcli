@@ -36,7 +36,7 @@ func commandMap(cfg *config, _ []string) error {
 
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
-		return fmt.Errorf("JSON unmarhsal failed: %w", err)
+		return fmt.Errorf("JSON unmarshal failed: %w", err)
 	}
 
 	if apiResponse.Previous == nil {
@@ -89,7 +89,7 @@ func commandMapb(cfg *config, _ []string) error {
 
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
-		return fmt.Errorf("JSON unmarhsal failed: %w", err)
+		return fmt.Errorf("JSON unmarshal failed: %w", err)
 	}
 
 	if apiResponse.Previous == nil {

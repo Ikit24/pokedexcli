@@ -83,6 +83,11 @@ func getCommands(cfg *config) map[string]cliCommand {
             description: "Displays pokemons in the current area",
             callback:    commandExplore,
         },
+        "catch": {
+            name:        "catch",
+            description: "Catches Pokemon adds them to the user's Pokedex",
+            callback:    commandCatch,
+        },
     }
 }
 

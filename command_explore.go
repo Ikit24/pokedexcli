@@ -40,7 +40,7 @@ func commandExplore(cfg *config, location_area_name []string) error {
 
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
-		return fmt.Errorf("JSON unmarhsal failed: %w", err)
+		return fmt.Errorf("JSON unmarshal failed: %w", err)
 	}
 
 	fmt.Println("Exploring", location_area_name[0], "...")
