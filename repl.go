@@ -6,6 +6,7 @@ import (
     "os"
     "strings"
     "github.com/Ikit24/pokedexcli/internal/pokecache"
+    "github.com/Ikit24/pokedexcli/internal/pokeapi"
     "time"
 )
 
@@ -16,10 +17,9 @@ func startRepl() {
 
     cfg.Next = "https://pokeapi.co/api/v2/location-area/"
     cfg.Previous = ""
-
     cfg.Cache = pokecache.NewCache(1 * time.Minute)
-
     cfg.MyMap = getCommands(&cfg)
+    cfg.Caught = make(map[string]pokeapi.Pokemon)
 
     for {
         fmt.Println("Pokedex > ")
@@ -96,4 +96,5 @@ type config struct {
     Previous    string
     MyMap       map[string]cliCommand
     Cache       pokecache.Cache
+    Caught      map[string]pokeapi.Pokemon
 }
