@@ -51,7 +51,6 @@ func commandCatch(cfg *config, pokemon_name []string) error {
 	var baseXP_low = 100
 	var baseXP_medium = 150
 	var baseXP_high = 300
-
 	var catch_Chance int
 
 	if apiResponse.BaseExperience <= baseXP_low {

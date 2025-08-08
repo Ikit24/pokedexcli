@@ -93,6 +93,11 @@ func getCommands(cfg *config) map[string]cliCommand {
             description: "Displays information about the already caputred Pokemon",
             callback:    commandInspect,
         },
+        "pokedex": {
+            name:        "pokedex",
+            description: "list of all the names of the Pokemon the user has caught",
+            callback:    commandPokedex,
+        },
     }
 }
 
