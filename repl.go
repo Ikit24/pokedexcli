@@ -22,7 +22,7 @@ func startRepl() {
     cfg.Caught = make(map[string]pokeapi.Pokemon)
 
     for {
-        fmt.Println("Pokedex > ")
+        fmt.Printf("Pokedex > ")
         usr_input.Scan()
         words := cleanInput(usr_input.Text())
         if len(words) == 0 {
@@ -87,6 +87,11 @@ func getCommands(cfg *config) map[string]cliCommand {
             name:        "catch",
             description: "Catches Pokemon adds them to the user's Pokedex",
             callback:    commandCatch,
+        },
+        "inspect": {
+            name:        "inspect",
+            description: "Displays information about the already caputred Pokemon",
+            callback:    commandInspect,
         },
     }
 }
