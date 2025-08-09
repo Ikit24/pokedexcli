@@ -8,12 +8,22 @@ import (
     "github.com/Ikit24/pokedexcli/internal/pokecache"
     "github.com/Ikit24/pokedexcli/internal/pokeapi"
     "time"
+    "github.com/eiannone/keyboard"
 )
 
 func startRepl() {
-    usr_input := bufio.NewScanner(os.Stdin)
+    kb, err := keyboard.Open()
+    if err != nil {
+        panic(err)
+    }
+    defer kb.Close()
 
+    var input_buffer []rune
+    var commandHistory []string
+    var historyIndex int
     var cfg config
+
+    historyIndex = len(commandHistory)
 
     cfg.Next = "https://pokeapi.co/api/v2/location-area/"
     cfg.Previous = ""
@@ -22,12 +32,50 @@ func startRepl() {
     cfg.Caught = make(map[string]pokeapi.Pokemon)
 
     for {
-        fmt.Printf("Pokedex > ")
-        usr_input.Scan()
-        words := cleanInput(usr_input.Text())
-        if len(words) == 0 {
-            continue
+        char, key, err := keyboard.GetSingleKey()
+        if err != nil {
+            panic(err)
         }
+        if key != 0 {
+            if key == keyboard.KeyEnter {
+                commandText := string(input_buffer)
+                words := cleanInput(commandText)
+
+                if len(words) == 0 {
+                    input_buffer = []rune{}
+                    historyIndex = len(commandHistory)
+                    continue
+                }
+            commandName := words[0]
+            cmd, ok := cfg.MyMap[commandName]
+            if ok {
+                err := cmd.callback(&cfg, words[1:])
+                if err != nil {
+                    fmt.Print("\r\033[K")
+                    fmt.Println(err)
+                }
+            } else {
+                fmt.Print("\r\033[K")
+                fmt.Println("Unknown command")
+            }
+            commandHistory = append(commandHistory, commandText)
+            // Clear input_buffer
+            input_buffer = []rune{}
+            // Reset to new input state
+            historyIndex = len(commandHistory)
+
+            } else if key == keyboard.KeyArrowDown {
+                
+            } else if key == keyboard.KeyBackspace || key == keyboard.KeyBackspace2 {
+                if len(input_buffer) > 0 {
+                    input_buffer = input_buffer[:len(input_buffer)-1]
+                }
+        } else {
+            input_buffer = append(input_buffer, char)
+        }
+        fmt.Print("\r\033[K")
+        fmt.Printf("Pokedex > %s", string(input_buffer))
+
         commandName := words[0]
 
         cmd, ok := cfg.MyMap[commandName]
