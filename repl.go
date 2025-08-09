@@ -2,8 +2,6 @@ package main
 
 import (
     "fmt"
-    "bufio"
-    "os"
     "strings"
     "github.com/Ikit24/pokedexcli/internal/pokecache"
     "github.com/Ikit24/pokedexcli/internal/pokeapi"
@@ -12,11 +10,11 @@ import (
 )
 
 func startRepl() {
-    kb, err := keyboard.Open()
+    err := keyboard.Open()
     if err != nil {
         panic(err)
     }
-    defer kb.Close()
+    defer keyboard.Close()
 
     var input_buffer []rune
     var commandHistory []string
@@ -31,6 +29,7 @@ func startRepl() {
     cfg.MyMap = getCommands(&cfg)
     cfg.Caught = make(map[string]pokeapi.Pokemon)
 
+    fmt.Print("Pokedex > ")
     for {
         char, key, err := keyboard.GetSingleKey()
         if err != nil {
@@ -44,51 +43,56 @@ func startRepl() {
                 if len(words) == 0 {
                     input_buffer = []rune{}
                     historyIndex = len(commandHistory)
+                    fmt.Println()
                     continue
                 }
-            commandName := words[0]
-            cmd, ok := cfg.MyMap[commandName]
-            if ok {
-                err := cmd.callback(&cfg, words[1:])
-                if err != nil {
-                    fmt.Print("\r\033[K")
-                    fmt.Println(err)
-                }
-            } else {
                 fmt.Print("\r\033[K")
-                fmt.Println("Unknown command")
-            }
-            commandHistory = append(commandHistory, commandText)
-            // Clear input_buffer
-            input_buffer = []rune{}
-            // Reset to new input state
-            historyIndex = len(commandHistory)
 
+                commandName := words[0]
+                cmd, ok := cfg.MyMap[commandName]
+                if ok {
+                    err := cmd.callback(&cfg, words[1:])
+                    if err != nil {
+                        fmt.Println(err)
+                    }
+                } else {
+                    fmt.Println("Unknown command")
+                }
+                fmt.Println()
+
+                commandHistory = append(commandHistory, commandText)
+                // Clear input_buffer
+                input_buffer = []rune{}
+                // Reset to new input state
+                historyIndex = len(commandHistory)
+            } else if key == keyboard.KeyArrowUp {
+                if historyIndex == 0 {
+                    historyIndex = 0
+                } else {
+                    historyIndex -= 1
+                    input_buffer = []rune(commandHistory[historyIndex])
+                }
             } else if key == keyboard.KeyArrowDown {
-                
+                if historyIndex < len(commandHistory) {
+                    historyIndex += 1
+                }
+                if historyIndex < len(commandHistory) {
+                    input_buffer = []rune(commandHistory[historyIndex])
+                } else {
+                    input_buffer = []rune{}
+                }
+            } else if key == keyboard.KeySpace {
+                input_buffer = append(input_buffer, ' ')
             } else if key == keyboard.KeyBackspace || key == keyboard.KeyBackspace2 {
                 if len(input_buffer) > 0 {
                     input_buffer = input_buffer[:len(input_buffer)-1]
                 }
+            }
         } else {
             input_buffer = append(input_buffer, char)
         }
         fmt.Print("\r\033[K")
         fmt.Printf("Pokedex > %s", string(input_buffer))
-
-        commandName := words[0]
-
-        cmd, ok := cfg.MyMap[commandName]
-        if ok {
-            err := cmd.callback(&cfg, words[1:])
-            if err != nil {
-                fmt.Println(err)
-            }
-            continue
-        } else {
-            fmt.Println("Unknown command")
-            continue
-        }
     }
 }
 
@@ -108,42 +112,42 @@ func getCommands(cfg *config) map[string]cliCommand {
     return map[string]cliCommand{
         "help": {
             name:        "help",
-            description: "Displays a help message",
+            description: "Displays commamd list",
             callback:    commandHelp,
         },
         "exit": {
             name:        "exit",
-            description: "Exit the Pokedex",
+            description: "Exits the Pokedex",
             callback:    commandExit,
         },
         "map": {
             name:        "map",
-            description: "Displays the current 20 entries",
+            description: "Displays the map to explore",
             callback:    commandMap,
         },
         "mapb": {
             name:        "mapb",
-            description: "Displays the previous 20 entries",
+            description: "Displays the previous map list",
             callback:    commandMapb,
         },
         "explore": {
             name:        "explore",
-            description: "Displays pokemons in the current area",
+            description: "Displays the pokemons in the current area",
             callback:    commandExplore,
         },
         "catch": {
             name:        "catch",
-            description: "Catches Pokemon adds them to the user's Pokedex",
+            description: "Catches Pokemons and adds them to the your Pokedex",
             callback:    commandCatch,
         },
         "inspect": {
             name:        "inspect",
-            description: "Displays information about the already caputred Pokemon",
+            description: "Displays information about the already captured Pokemons",
             callback:    commandInspect,
         },
         "pokedex": {
             name:        "pokedex",
-            description: "list of all the names of the Pokemon the user has caught",
+            description: "List of all the Pokemons that you captured",
             callback:    commandPokedex,
         },
     }
