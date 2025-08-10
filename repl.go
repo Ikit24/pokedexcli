@@ -28,6 +28,7 @@ func startRepl() {
     cfg.Cache = pokecache.NewCache(1 * time.Minute)
     cfg.MyMap = getCommands(&cfg)
     cfg.Caught = make(map[string]pokeapi.Pokemon)
+    cfg.Battle = make(map[string]pokeapi.BattlePokemon)
 
     fmt.Print("Pokedex > ")
     for {
@@ -150,6 +151,11 @@ func getCommands(cfg *config) map[string]cliCommand {
             description: "List of all the Pokemons that you captured",
             callback:    commandPokedex,
         },
+        "battle": {
+            name:        "battle",
+            description: "Initiates a battle by using one of your captured Pokemon and a selected pokemon in the current area",
+            callback:    commandBattle,
+        },
     }
 }
 
@@ -159,4 +165,5 @@ type config struct {
     MyMap       map[string]cliCommand
     Cache       pokecache.Cache
     Caught      map[string]pokeapi.Pokemon
+    Battle      map[string]pokeapi.BattlePokemon
 }
