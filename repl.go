@@ -27,7 +27,7 @@ func startRepl() {
     cfg.Previous = ""
     cfg.Cache = pokecache.NewCache(1 * time.Minute)
     cfg.MyMap = getCommands(&cfg)
-    cfg.Caught = make(map[string]pokeapi.Pokemon)
+    cfg.Caught = make(map[string]pokeapi.BattlePokemon)
     cfg.Battle = make(map[string]pokeapi.BattlePokemon)
 
     fmt.Print("Pokedex > ")
@@ -164,6 +164,6 @@ type config struct {
     Previous    string
     MyMap       map[string]cliCommand
     Cache       pokecache.Cache
-    Caught      map[string]pokeapi.Pokemon
+    Caught      map[string]pokeapi.BattlePokemon
     Battle      map[string]pokeapi.BattlePokemon
 }

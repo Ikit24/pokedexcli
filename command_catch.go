@@ -38,7 +38,7 @@ func commandCatch(cfg *config, pokemon_name []string) error {
 		body = cachedData
 		err = nil
 	}
-	var apiResponse pokeapi.Pokemon
+	var apiResponse pokeapi.BattlePokemon
 
 	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
