@@ -2,16 +2,55 @@ package main
 
 import (
 	"fmt"
+	"bufio"
+	"strings"
+	"os"
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
 )
 
-func commandBattle(cfg *config, pokemon_name, target_name string) error {
-	if len(pokemon_name) == 0 {
-		return fmt.Errorf("Please provide pokemon name in order to battle")
+func commandBattle(cfg *config, args []string) error {
+	if len(args) < 2 {
+		return fmt.Errorf("Usage: battle <your-pokemon> <target-pokemon>")
 	}
-	if len(target_name) == 0 {
-		return fmt.Errorf("Please provide a target pokemon name in your area in order to battle")
+	pokemon_name := args[0]
+	target_name := args[1]
+
+	pokemon, ok := cfg.Caught[pokemon_name]
+	if !ok {
+		return fmt.Errorf("Pokemon does not exist in your collection")
 	}
+	targetPokemon, ok := cfg.Battle[target_name]
+	if !ok {
+		return fmt.Errorf("Invalid target")
+	}
+
+	playerPokemonStats, err := getAllBattleStats(pokemon)
+	if err != nil {
+		return err
+	}
+
+	opponentPokemonStats, err := getAllBattleStats(targetPokemon)
+	if err != nil {
+		return err
+	}
+
+	displayBattleComparison(playerPokemonStats, opponentPokemonStats, pokemon.Name, targetPokemon.Name)
+	fmt.Println("Proceed with battle? (y/n): ")
+	reader := bufio.NewReader(os.Stdin)
+    line, err := reader.ReadString('\n')
+    if err != nil {
+        return fmt.Errorf("invalid command")
+	}
+	response := strings.TrimSpace(strings.ToLower(line))
+	if response == "n" || response == "no" {
+		fmt.Println("Battle cancelled.")
+		return nil
+	}
+	if response != "y" && response != "yes" {
+		return fmt.Errorf("invalid response. Please enter y or n")
+	}
+	fmt.Println("Battle begins!")
+	return nil
 }
 
 type Move struct {
@@ -37,7 +76,6 @@ func generateBasicMoves(pokemon pokeapi.BattlePokemon) ([]Move, error) {
 	} else {
 		return nil, fmt.Errorf("pokemon %s has no type data - possible corruption. Please restart.", pokemon.Name)
 	}
-
     return moves, nil
 }
 
@@ -49,10 +87,34 @@ func getStatValue(stats []struct {
 }, statName string) (int, error) {
     for _, stat := range stats {
         if stat.Stat.Name == statName {
-            return stat.BaseStat
+            return stat.BaseStat, nil
         }
     }
     return 0, fmt.Errorf("pokemon %s stat not found, data corruption or server error possible. Please restart.", statName)
+}
+
+func getAllBattleStats(pokemon pokeapi.BattlePokemon) (map[string]int, error) {
+	stats := make(map[string]int)
+	for _, stat := range pokemon.Stats {
+		stats[stat.Stat.Name] = stat.BaseStat
+	}
+	return stats, nil
+}
+
+func displayBattleComparison(playerStats, opponentStats map[string]int, playerName, opponentName string) {
+	fmt.Printf("%-20s vs %-20s\n", playerName, opponentName)
+	fmt.Println(strings.Repeat("-", 45))
+
+	coreStats := []string{"hp", "attack", "defense", "speed"}
+
+	for _, statName := range coreStats {
+		playerValue := playerStats[statName]
+		opponentValue := opponentStats[statName]
+
+		fmt.Printf("%-20s %-20s\n", 
+            fmt.Sprintf("%s: %d", strings.Title(statName), playerValue),
+            fmt.Sprintf("%s: %d", strings.Title(statName), opponentValue))
+	}
 }
 
 func getTypeMove(pokemonType string) Move {
