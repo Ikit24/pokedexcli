@@ -3,9 +3,11 @@ package main
 import (
     "fmt"
     "strings"
+    "time"
     "github.com/Ikit24/pokedexcli/internal/pokecache"
     "github.com/Ikit24/pokedexcli/internal/pokeapi"
-    "time"
+    "github.com/Ikit24/pokedexcli/internal/config"
+    "github.com/Ikit24/pokedexcli/commands"
     "github.com/eiannone/keyboard"
 )
 
@@ -19,7 +21,7 @@ func startRepl() {
     var input_buffer []rune
     var commandHistory []string
     var historyIndex int
-    var cfg config
+    var cfg config.Config
 
     historyIndex = len(commandHistory)
 
@@ -52,7 +54,7 @@ func startRepl() {
                 commandName := words[0]
                 cmd, ok := cfg.MyMap[commandName]
                 if ok {
-                    err := cmd.callback(&cfg, words[1:])
+                    err := cmd.Callback(&cfg, words[1:])
                     if err != nil {
                         fmt.Println(err)
                     }
@@ -103,67 +105,52 @@ func cleanInput(text string) []string {
     return words
 }
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func(*config, []string) error
-}
-
-func getCommands(cfg *config) map[string]cliCommand {
-    return map[string]cliCommand{
+func getCommands(cfg *config.Config) map[string]config.CliCommand {
+    return map[string]config.CliCommand{
         "help": {
-            name:        "help",
-            description: "Displays commamd list",
-            callback:    commandHelp,
+            Name:        "help",
+            Description: "Displays command list",
+            Callback:    commands.CommandHelp,
         },
         "exit": {
-            name:        "exit",
-            description: "Exits the Pokedex",
-            callback:    commandExit,
+            Name:        "exit",
+            Description: "Exits the Pokedex",
+            Callback:    commands.CommandExit,
         },
         "map": {
-            name:        "map",
-            description: "Displays the map to explore",
-            callback:    commandMap,
+            Name:        "map",
+            Description: "Displays the map to explore",
+            Callback:    commands.CommandMap,
         },
         "mapb": {
-            name:        "mapb",
-            description: "Displays the previous map list",
-            callback:    commandMapb,
+            Name:        "mapb",
+            Description: "Displays the previous map list",
+            Callback:    commands.CommandMapb,
         },
         "explore": {
-            name:        "explore",
-            description: "Displays the pokemons in the current area",
-            callback:    commandExplore,
+            Name:        "explore",
+            Description: "Displays the pokemons in the current area",
+            Callback:    commands.CommandExplore,
         },
         "catch": {
-            name:        "catch",
-            description: "Catches Pokemons and adds them to the your Pokedex",
-            callback:    commandCatch,
+            Name:        "catch",
+            Description: "Catches Pokemons and adds them to your Pokedex",
+            Callback:    commands.CommandCatch,
         },
         "inspect": {
-            name:        "inspect",
-            description: "Displays information about the already captured Pokemons",
-            callback:    commandInspect,
+            Name:        "inspect",
+            Description: "Displays information about the already captured Pokemons",
+            Callback:    commands.CommandInspect,
         },
         "pokedex": {
-            name:        "pokedex",
-            description: "List of all the Pokemons that you captured",
-            callback:    commandPokedex,
+            Name:        "pokedex",
+            Description: "List of all the Pokemons that you captured",
+            Callback:    commands.CommandPokedex,
         },
         "battle": {
-            name:        "battle",
-            description: "Initiates a battle by using one of your captured Pokemon and a selected pokemon in the current area",
-            callback:    commandBattle,
+            Name:        "battle",
+            Description: "Initiates a battle by using one of your captured Pokemon and a selected pokemon in the current area",
+            Callback:    commands.CommandBattle,
         },
     }
-}
-
-type config struct {
-    Next        string
-    Previous    string
-    MyMap       map[string]cliCommand
-    Cache       pokecache.Cache
-    Caught      map[string]pokeapi.BattlePokemon
-    Battle      map[string]pokeapi.BattlePokemon
 }

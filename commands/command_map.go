@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"encoding/json"
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
+	"github.com/Ikit24/pokedexcli/internal/config"
 )
 
-func commandMap(cfg *config, _ []string) error {
+func CommandMap(cfg *config.Config, _ []string) error {
 	var body []byte
 	var err error
 
@@ -57,7 +58,7 @@ func commandMap(cfg *config, _ []string) error {
 	return nil
 	}
 
-func commandMapb(cfg *config, _ []string) error {
+func CommandMapb(cfg *config.Config, _ []string) error {
 	if cfg.Previous == "" {
 		fmt.Println("you're on the first page")
 		return nil

@@ -1,10 +1,11 @@
-package main
+package commands
 
 import (
 	"fmt"
+	"github.com/Ikit24/pokedexcli/internal/config"
 )
 
-func commandInspect(cfg *config, pokemon_name []string) error {
+func CommandInspect(cfg *config.Config, pokemon_name []string) error {
 	if len(pokemon_name) == 0 {
 		return fmt.Errorf("Must provide pokemon name in order to display it's details")
 	}

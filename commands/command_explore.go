@@ -1,4 +1,4 @@
-package main
+package commands
 
 import(
 	"fmt"
@@ -6,9 +6,10 @@ import(
 	"net/http"
 	"encoding/json"
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
+	"github.com/Ikit24/pokedexcli/internal/config"
 )
 
-func commandExplore(cfg *config, location_area_name []string) error {
+func CommandExplore(cfg *config.Config, location_area_name []string) error {
 	if len(location_area_name) == 0 {
 		return fmt.Errorf("Must provide loaction area name")
 	}

@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -6,20 +6,21 @@ import (
 	"strings"
 	"os"
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
+	"github.com/Ikit24/pokedexcli/internal/config"
 )
 
-func commandBattle(cfg *config, args []string) error {
+func CommandBattle(cfg *config.Config, args []string) error {
 	if len(args) < 2 {
 		return fmt.Errorf("Usage: battle <your-pokemon> <target-pokemon>")
 	}
-	pokemon_name := args[0]
-	target_name := args[1]
+	pokemonName := args[0]
+	targetName := args[1]
 
-	pokemon, ok := cfg.Caught[pokemon_name]
+	pokemon, ok := cfg.Caught[pokemonName]
 	if !ok {
 		return fmt.Errorf("Pokemon does not exist in your collection")
 	}
-	targetPokemon, ok := cfg.Battle[target_name]
+	targetPokemon, ok := cfg.Battle[targetName]
 	if !ok {
 		return fmt.Errorf("Invalid target")
 	}

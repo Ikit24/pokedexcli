@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -6,15 +6,16 @@ import (
 	"net/http"
 	"encoding/json"
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
+	"github.com/Ikit24/pokedexcli/internal/config"
 	"math/rand"
 )
 
-func commandCatch(cfg *config, pokemon_name []string) error {
-	if len(pokemon_name) == 0 {
+func CommandCatch(cfg *config.Config, pokemonName []string) error {
+	if len(pokemonName) == 0 {
 		return fmt.Errorf("Must provide pokemon name in order to catch")
 	}
 	
-	var catch_URL = "https://pokeapi.co/api/v2/pokemon/" + pokemon_name[0] + "/"
+	var catch_URL = "https://pokeapi.co/api/v2/pokemon/" + pokemonName[0] + "/"
 
 	var body []byte
 	var err error
@@ -45,7 +46,7 @@ func commandCatch(cfg *config, pokemon_name []string) error {
 		return fmt.Errorf("JSON unmarshal failed: %w", err)
 	}
 
-	fmt.Printf("Throwing a Pokeball at %s...", pokemon_name[0])
+	fmt.Printf("Throwing a Pokeball at %s...", pokemonName[0])
 	fmt.Println()
 
 	var baseXP_low = 100
@@ -65,10 +66,10 @@ func commandCatch(cfg *config, pokemon_name []string) error {
 
 	randomRoll := rand.Intn(100) + 1
 	if randomRoll <= catch_Chance {
-		fmt.Printf("%s was caught!\n", pokemon_name[0])
+		fmt.Printf("%s was caught!\n", pokemonName[0])
 		cfg.Caught[apiResponse.Name] = apiResponse
 	} else {
-		fmt.Printf("%s escaped!\n", pokemon_name[0])
+		fmt.Printf("%s escaped!\n", pokemonName[0])
 	}
 	return nil
 }
