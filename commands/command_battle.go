@@ -51,6 +51,75 @@ func CommandBattle(cfg *config.Config, args []string) error {
 		return fmt.Errorf("invalid response. Please enter y or n")
 	}
 	fmt.Println("Battle begins!")
+	
+	// Create battle copies
+	playerBattlePokemon := cfg.Caught[pokemonName]
+	opponentBattlePokemon := cfg.Battle[targetName]
+
+	playerMaxHP, err := getStatValue(playerBattlePokemon.Stats, "hp")
+	if err != nil {
+		return fmt.Errorf("Error, couldn't initialize player hp. Please try again.")
+	}
+	playerBattlePokemon.CurrentHP = playerMaxHP
+	playerBattlePokemon.StatusEffects = []string{}
+
+	opponentMaxHP, err := getStatValue(opponentBattlePokemon.Stats, "hp")
+	if err != nil {
+		return fmt.Errorf("Error, couldn't initialize opponent hp. Please try again.")
+	}
+	opponentBattlePokemon.CurrentHP = opponentMaxHP
+	opponentBattlePokemon.StatusEffects = []string{}
+
+	playerSpeed, err := getStatValue(playerBattlePokemon.Stats, "speed")
+	if err != nil {
+		return fmt.Errorf("Error getting player speed")
+	}
+
+	opponentSpeed, err := getStatValue(opponentBattlePokemon.Stats, "speed")
+	if err != nil {
+		return fmt.Errorf("Error getting opponent speed")
+	}
+
+	if playerSpeed >= opponentSpeed {
+		fmt.Println("Your Pokemon is faster. You go first!")
+		fmt.Println("Choose your move:")
+		for i, move := range playerMoves {
+			fmt.Print("%d. %s\n", i+1, move.Name)
+		}
+		playerInput := bufio.NewReader(os.Stdin)
+		choice, err := playerInput.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("invalid input")
+		}
+		response := strings.TrimSpace(strings.ToLower(choice))
+
+		if len(response) == 0 {
+			return fmt.Errorf("Please enter a number")
+		choiceNum, err := strconv.Atoi(response)
+		if err != nil {
+			return fmt.Errorf("Please enter a number")
+		}
+		} else if chioceNum < 1 || choiceNum > len(playerMoves) {
+			return fmt.Errorf("Please enter the number between 1 and  %d", len(playerMoves))
+		}
+	} else {
+		fmt.Println("Opponent is faster. You go second!")
+	}
+
+	playerMoves, err := generateBasicMoves(playerBattlePokemon)
+	if err != nil {
+		return fmt.Errorf("Error generating player moves: %w", err)
+	}
+	opponentMoves, err := generateBasicMoves(opponentBattlePokemon)
+	if err != nil {
+		return fmt.Errorf("Error generating opponent moves: %w", err)
+	}
+
+
+
+
+
+
 	return nil
 }
 
