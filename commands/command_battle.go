@@ -86,30 +86,9 @@ func CommandBattle(cfg *config.Config, args []string) error {
 		return fmt.Errorf("Error getting opponent speed")
 	}
 
-	if playerSpeed >= opponentSpeed {
+if playerSpeed >= opponentSpeed {
 		fmt.Println("Your Pokemon is faster. You go first!")
-		fmt.Println("Choose your move:")
-		for i, move := range playerMoves {
-			fmt.Printf("%d. %s\n", i+1, move.Name)
-		}
-		playerInput := bufio.NewReader(os.Stdin)
-		choice, err := playerInput.ReadString('\n')
-		if err != nil {
-			return fmt.Errorf("invalid input")
-		}
-		response := strings.TrimSpace(strings.ToLower(choice))
-
-		if len(response) == 0 {
-			return fmt.Errorf("Please enter a number")
-		}
-		choiceNum, err := strconv.Atoi(response)
-		if err != nil {
-			return fmt.Errorf("Please enter a number")
-		} else if choiceNum < 1 || choiceNum > len(playerMoves) {
-			return fmt.Errorf("Please enter the number between 1 and  %d", len(playerMoves))
-		}
 		
-		chosenMove := playerMoves[choiceNum - 1]
 		playerAttack, err := getStatValue(playerBattlePokemon.Stats, "attack")
 		if err != nil {
 			return fmt.Errorf("Error getting player attack.")
@@ -127,33 +106,140 @@ func CommandBattle(cfg *config.Config, args []string) error {
 		if err != nil {
 			return fmt.Errorf("Error getting opponent defense.")
 		}
-		damage := (playerAttack * chosenMove.Power) / (opponentDefense * 2)
-		finalDamage := int(damage)
-		opponentBattlePokemon.CurrentHP -= finalDamage
-		fmt.Printf("%s dealt %d to %s, remaining opponent HP: %d", playerBattlePokemon.Name,
-			finalDamage,
-			opponentBattlePokemon.Name,
-			opponentBattlePokemon.CurrentHP)
 
-		if opponentBattlePokemon.CurrentHP <= 0 {
-			fmt.Println("You won! If you wish you can catpure the opponent with 100% success.")
-			reader := bufio.NewReader(os.Stdin)
-			choice, err := reader.ReadString('\n')
+		for playerBattlePokemon.CurrentHP > 0 && opponentBattlePokemon.CurrentHP > 0 {
+			fmt.Println("Choose your move:")
+			for i, move := range playerMoves {
+				fmt.Printf("%d. %s\n", i+1, move.Name)
+			}
+			playerInput := bufio.NewReader(os.Stdin)
+			choice, err := playerInput.ReadString('\n')
 			if err != nil {
-				return fmt.Errorf("Invalid command. Please type 'y' or 'n'")
+				return fmt.Errorf("invalid input")
 			}
 			response := strings.TrimSpace(strings.ToLower(choice))
-			if response == "n" {
-				fmt.Println("The defeated pokemon stays free. You won and walk on your path.")
-			} else if response != "y" {
-				return fmt.Errorf("invalid response. Please enter y or n")
-			} else {
-				cfg.Caught[opponentBattlePokemon.Name] = opponentBattlePokemon
-				fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
+
+			if len(response) == 0 {
+				return fmt.Errorf("Please enter a number")
 			}
+			choiceNum, err := strconv.Atoi(response)
+			if err != nil {
+				return fmt.Errorf("Please enter a number")
+			} else if choiceNum < 1 || choiceNum > len(playerMoves) {
+				return fmt.Errorf("Please enter the number between 1 and  %d", len(playerMoves))
+			}
+		
+			chosenMove := playerMoves[choiceNum - 1]
+			damage := (playerAttack * chosenMove.Power) / (opponentDefense * 2)
+			finalDamage := int(damage)
+			opponentBattlePokemon.CurrentHP -= finalDamage
+			fmt.Printf("%s dealt %d to %s, remaining opponent HP: %d", playerBattlePokemon.Name,
+				finalDamage,
+				opponentBattlePokemon.Name,
+				opponentBattlePokemon.CurrentHP)
+
+			strongestOpponentMove := opponentMoves[0]
+			for _, move := range opponentMoves {
+				if move.Power > strongestOpponentMove.Power {
+					strongestOpponentMove = move
+				}
+			}
+			opponentDamage := (opponentAttack * strongestOpponentMove.Power) / (playerDefense * 2)
+			finalOpponentDamage := int(opponentDamage)
+			if opponentBattlePokemon.CurrentHP > 0 {
+				playerBattlePokemon.CurrentHP -= finalOpponentDamage
+				fmt.Printf("%s dealt %d to %s, remaining player HP: %d", opponentBattlePokemon.Name,
+				finalOpponentDamage,
+				playerBattlePokemon.Name,
+				playerBattlePokemon.CurrentHP)
+			}
+				if playerBattlePokemon.CurrentHP <= 0 {
+				fmt.Println("You lost... You walk away defeated")
+				return nil
+				}
+				if opponentBattlePokemon.CurrentHP <= 0 {
+					fmt.Println("You won! If you wish you can catpure the opponent with 100% success.")
+					reader := bufio.NewReader(os.Stdin)
+					choice, err := reader.ReadString('\n')
+					if err != nil {
+						return fmt.Errorf("Invalid command. Please type 'y' or 'n'")
+					}
+					response := strings.TrimSpace(strings.ToLower(choice))
+					if response == "n" {
+						fmt.Println("The defeated pokemon stays free. You won and walk on your path.")
+					} else if response != "y" {
+						return fmt.Errorf("invalid response. Please enter y or n")
+					} else {
+						cfg.Caught[opponentBattlePokemon.Name] = opponentBattlePokemon
+						fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
+					}
+				}
 		}
 	} else {
 		fmt.Println("Opponent is faster. You go second!")
+		for playerBattlePokemon.CurrentHP > 0 && opponentBattlePokemon.CurrentHP > 0 {
+			strongestOpponentMove := opponentMoves[0]
+			for _, move := range opponentMoves {
+				if move.Power > strongestOpponentMove.Power {
+					strongestOpponentMove = move
+				}
+			}
+			opponentDamage := (opponentAttack * strongestOpponentMove.Power) / (playerDefense * 2)
+			finalOpponentDamage := int(opponentDamage)
+			playerBattlePokemon.CurrentHP -= finalOpponentDamage
+			fmt.Printf("%s dealt %d to %s, remaining player HP: %d", opponentBattlePokemon.Name,
+			finalOpponentDamage,
+			playerBattlePokemon.Name,
+			playerBattlePokemon.CurrentHP)
+			if playerBattlePokemon.CurrentHP <= 0 {
+			fmt.Println("You lost... You walk away defeated")
+			return nil
+			}
+			fmt.Println("Choose your move:")
+			for i, move := range playerMoves {
+				fmt.Printf("%d. %s\n", i+1, move.Name)
+			}
+			playerInput := bufio.NewReader(os.Stdin)
+			choice, err := playerInput.ReadString('\n')
+			if err != nil {
+				return fmt.Errorf("invalid input")
+			}
+			response := strings.TrimSpace(strings.ToLower(choice))
+
+			if len(response) == 0 {
+				return fmt.Errorf("Please enter a number")
+			}
+			choiceNum, err := strconv.Atoi(response)
+			if err != nil {
+				return fmt.Errorf("Please enter a number")
+			} else if choiceNum < 1 || choiceNum > len(playerMoves) {
+				return fmt.Errorf("Please enter the number between 1 and  %d", len(playerMoves))
+			}
+			chosenMove := playerMoves[choiceNum - 1]
+			damage := (playerAttack * chosenMove.Power) / (opponentDefense * 2)
+			finalDamage := int(damage)
+			opponentBattlePokemon.CurrentHP -= finalDamage
+			fmt.Printf("%s dealt %d to %s, remaining opponent HP: %d", playerBattlePokemon.Name,
+				finalDamage,
+				opponentBattlePokemon.Name,
+				opponentBattlePokemon.CurrentHP)
+			if opponentBattlePokemon.CurrentHP <= 0 {
+				fmt.Println("You won! If you wish you can catpure the opponent with 100% success.")
+				reader := bufio.NewReader(os.Stdin)
+				choice, err := reader.ReadString('\n')
+				if err != nil {
+					return fmt.Errorf("Invalid command. Please type 'y' or 'n'")
+				}
+				response := strings.TrimSpace(strings.ToLower(choice))
+				if response == "n" {
+					fmt.Println("The defeated pokemon stays free. You won and walk on your path.")
+				} else if response != "y" {
+					return fmt.Errorf("invalid response. Please enter y or n")
+				} else {
+					cfg.Caught[opponentBattlePokemon.Name] = opponentBattlePokemon
+					fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
+				}
+		}
 	}
 
 	opponentMoves, err := generateBasicMoves(opponentBattlePokemon)
