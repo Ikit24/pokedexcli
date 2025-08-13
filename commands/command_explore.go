@@ -14,6 +14,7 @@ func CommandExplore(cfg *config.Config, location_area_name []string) error {
 		return fmt.Errorf("Must provide loaction area name")
 	}
 	var explore_URL = "https://pokeapi.co/api/v2/location-area/" + location_area_name[0] + "/"
+	fmt.Println("Exploring...")
 
 	var body []byte
 	var err error
@@ -75,6 +76,7 @@ func CommandExplore(cfg *config.Config, location_area_name []string) error {
 		cfg.Battle[pokemonName] = pokemonResponse
 	}
 	fmt.Println("Exploring", location_area_name[0], "...")
+	fmt.Println()
 	fmt.Println("Found Pokemon:")
 
 	for _, encounter := range apiResponse.PokemonEncounters {
