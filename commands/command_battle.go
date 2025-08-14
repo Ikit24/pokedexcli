@@ -151,6 +151,8 @@ func CommandBattle(cfg *config.Config, args []string) error {
 	}
 	playerBattlePokemon.CurrentHP = playerMaxHP
 	playerBattlePokemon.StatusEffects = []string{}
+	playerBattlePokemon.CurrentXP = 0
+	playerBattlePokemon.Level = 1
 
 	opponentMaxHP, err := getStatValue(opponentBattlePokemon.Stats, "hp")
 	if err != nil {
@@ -158,6 +160,8 @@ func CommandBattle(cfg *config.Config, args []string) error {
 	}
 	opponentBattlePokemon.CurrentHP = opponentMaxHP
 	opponentBattlePokemon.StatusEffects = []string{}
+	opponentBattlePokemon.CurrentXP = 0
+	opponentBattlePokemon.Level = 1
 
 	playerSpeed, err := getStatValue(playerBattlePokemon.Stats, "speed")
 	if err != nil {
@@ -182,6 +186,9 @@ func CommandBattle(cfg *config.Config, args []string) error {
 			}
 			if opponentBattlePokemon.CurrentHP <= 0 {
 				fmt.Printf("You won! If you wish now is the time to capture %s without the chance of them escaping! ", opponentBattlePokemon.Name)
+				playerBattlePokemon.CurrentXP += opponentBattlePokemon.BaseExperience
+				fmt.Printf("%s gained %d XP!\n", playerBattlePokemon.Name, opponentBattlePokemon.BaseExperience)
+				checkLevelUp(&playerBattlePokemon)
 				fmt.Printf("Would you like to capture %s? (y/n):\n", opponentBattlePokemon.Name)
 				reader := bufio.NewReader(os.Stdin)
 				choice, err := reader.ReadString('\n')
@@ -229,6 +236,9 @@ func CommandBattle(cfg *config.Config, args []string) error {
 			if opponentBattlePokemon.CurrentHP <= 0 {
 				fmt.Println("You won! If you wish now is the time to capture %s without the chance of them escaping!\n", opponentBattlePokemon.Name)
 				fmt.Println("Please type 'y' or 'n'")
+				playerBattlePokemon.CurrentXP += opponentBattlePokemon.BaseExperience
+				fmt.Printf("%s gained %d XP!\n", playerBattlePokemon.Name, opponentBattlePokemon.BaseExperience)
+				checkLevelUp(&playerBattlePokemon)
 				reader := bufio.NewReader(os.Stdin)
 				choice, err := reader.ReadString('\n')
 				if err != nil {
@@ -325,4 +335,26 @@ func getTypeMove(pokemonType string) Move {
 	default:
 		return Move{Name: "Normal Attack", Power: 35, Accuracy: 100}
 	}
+}
+
+func getXPForLevel(level int) int {
+	return level * level * level
+}
+
+func getLevelFromXP(currentXP int) int {
+	level := 1
+	for getXPForLevel(level+1) <= currentXP {
+		level++
+	}
+	return level
+}
+
+func checkLevelUp(pokemon *pokeapi.BattlePokemon) bool {
+	newLevel := getLevelFromXP(pokemon.CurrentXP)
+	if newLevel > pokemon.Level {
+		fmt.Printf("%s leveled up! Now level %d\n", pokemon.Name, newLevel)
+		pokemon.Level = newLevel
+		return true
+	}
+	return false
 }

@@ -55,4 +55,6 @@ type BattlePokemon struct {
  
     CurrentHP    int      `json:"-"`
     StatusEffects []string `json:"-"`
+    CurrentXP    int      `json:"-"`
+    Level        int      `json:"-"`
 }
