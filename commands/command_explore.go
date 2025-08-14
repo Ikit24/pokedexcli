@@ -11,7 +11,7 @@ import(
 
 func CommandExplore(cfg *config.Config, location_area_name []string) error {
 	if len(location_area_name) == 0 {
-		return fmt.Errorf("Must provide loaction area name")
+		return fmt.Errorf("Must provide location area name!")
 	}
 	var explore_URL = "https://pokeapi.co/api/v2/location-area/" + location_area_name[0] + "/"
 	fmt.Println("Exploring...")

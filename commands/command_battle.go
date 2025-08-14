@@ -28,7 +28,7 @@ func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemo
 	playerInput := bufio.NewReader(os.Stdin)
 	choice, err := playerInput.ReadString('\n')
 	if err != nil {
-		return fmt.Errorf("invalid input")
+		return fmt.Errorf("Invalid input")
 	}
 	response := strings.TrimSpace(strings.ToLower(choice))
 
@@ -49,7 +49,7 @@ func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemo
 	if opponentBattlePokemon.CurrentHP < 0 {
 		opponentBattlePokemon.CurrentHP = 0
 	}
-	fmt.Printf("%s dealt %d to %s, remaining opponent HP: %d \n", playerBattlePokemon.Name,
+	fmt.Printf("\n%s dealt %d to %s, remaining opponent HP: %d \n", playerBattlePokemon.Name,
 		finalDamage,
 		opponentBattlePokemon.Name,
 		opponentBattlePokemon.CurrentHP)
@@ -78,8 +78,9 @@ func opponentTurn(opponentBattlePokemon, playerBattlePokemon *pokeapi.BattlePoke
 	if playerBattlePokemon.CurrentHP < 0 {
 		playerBattlePokemon.CurrentHP = 0
 	}
-	fmt.Printf("%s dealt %d to %s, remaining player HP: %d ", opponentBattlePokemon.Name,
+	fmt.Printf("%s dealt %d to %s, remaining HP until %s faints: %d ", opponentBattlePokemon.Name,
 	finalOpponentDamage,
+	playerBattlePokemon.Name,
 	playerBattlePokemon.Name,
 	playerBattlePokemon.CurrentHP)
 	fmt.Println()
@@ -95,7 +96,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 
 	pokemon, ok := cfg.Caught[pokemonName]
 	if !ok {
-		return fmt.Errorf("Pokemon does not exist in your collection")
+		return fmt.Errorf("Pokemon does not exist in your collection yet.")
 	}
 	targetPokemon, ok := cfg.Battle[targetName]
 	if !ok {
@@ -118,7 +119,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 	reader := bufio.NewReader(os.Stdin)
     line, err := reader.ReadString('\n')
     if err != nil {
-        return fmt.Errorf("invalid command")
+        return fmt.Errorf("Invalid command")
 	}
 	response := strings.TrimSpace(strings.ToLower(line))
 	if response == "n" || response == "no" {
@@ -126,7 +127,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 		return nil
 	}
 	if response != "y" && response != "yes" {
-		return fmt.Errorf("invalid response. Please enter y or n")
+		return fmt.Errorf("Invalid response. Please enter y or n")
 	}
 	fmt.Println("Battle begins!")
 	fmt.Println()
@@ -167,6 +168,11 @@ func CommandBattle(cfg *config.Config, args []string) error {
 	if err != nil {
 		return fmt.Errorf("Error getting opponent speed")
 	}
+	if playerSpeed >= opponentSpeed {
+		fmt.Println("Your Pokemon is faster. You go first!")
+	} else {
+		fmt.Println("Opponent is faster. You go second!")
+	}
 
 	for playerBattlePokemon.CurrentHP > 0 && opponentBattlePokemon.CurrentHP > 0 {
 		if playerSpeed >= opponentSpeed {
@@ -175,8 +181,8 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				return err
 			}
 			if opponentBattlePokemon.CurrentHP <= 0 {
-				fmt.Println("You won! If you wish you can catpure the opponent with 100% success.")
-				fmt.Println("Please type 'y' or 'n'")
+				fmt.Printf("You won! If you wish now is the time to capture %s without the chance of them escaping! ", opponentBattlePokemon.Name)
+				fmt.Printf("Would you like to capture %s? (y/n):\n", opponentBattlePokemon.Name)
 				reader := bufio.NewReader(os.Stdin)
 				choice, err := reader.ReadString('\n')
 				if err != nil {
@@ -184,9 +190,9 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				}
 				response := strings.TrimSpace(strings.ToLower(choice))
 				if response == "n" {
-					fmt.Println("The defeated pokemon stays free. You won and walk on your path.")
+					fmt.Printf("The defeated %s stays free. You won and walk on your path.\n", opponentBattlePokemon.Name)
 				} else if response != "y" {
-					return fmt.Errorf("invalid response. Please enter y or n")
+					return fmt.Errorf("Invalid response. Please enter y or n")
 				} else {
 					cfg.Caught[opponentBattlePokemon.Name] = opponentBattlePokemon
 					fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
@@ -203,7 +209,6 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				return nil
 			}
 		} else {
-			fmt.Println("Opponent faster, you go second.")
 			err := opponentTurn(&opponentBattlePokemon, &playerBattlePokemon, opponentMoves)
 			if err != nil {
 				return err
@@ -222,7 +227,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 			}
 		
 			if opponentBattlePokemon.CurrentHP <= 0 {
-				fmt.Println("You won! If you wish you can catpure the opponent with 100% success.")
+				fmt.Println("You won! If you wish now is the time to capture %s without the chance of them escaping!\n", opponentBattlePokemon.Name)
 				fmt.Println("Please type 'y' or 'n'")
 				reader := bufio.NewReader(os.Stdin)
 				choice, err := reader.ReadString('\n')
@@ -231,9 +236,9 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				}
 				response := strings.TrimSpace(strings.ToLower(choice))
 				if response == "n" {
-					fmt.Println("The defeated pokemon stays free. You won and walk on your path.")
+					fmt.Printf("The defeated %s stays free. You won and walk on your path.\n", opponentBattlePokemon.Name)
 				} else if response != "y" {
-					return fmt.Errorf("invalid response. Please enter y or n")
+					return fmt.Errorf("Invalid response. Please enter y or n")
 				} else {
 					cfg.Caught[opponentBattlePokemon.Name] = opponentBattlePokemon
 					fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
@@ -256,7 +261,7 @@ func generateBasicMoves(pokemon pokeapi.BattlePokemon) ([]Move, error) {
  
     attackStat, err := getStatValue(pokemon.Stats, "attack")
 	if err != nil {
-		return nil, fmt.Errorf("cannot fetch stats")
+		return nil, fmt.Errorf("Cannot fetch stats")
 	}
     moves = append(moves, Move{
         Name:     "Tackle",
@@ -266,7 +271,7 @@ func generateBasicMoves(pokemon pokeapi.BattlePokemon) ([]Move, error) {
 	if len(pokemon.Types) > 0 {
 		moves = append(moves, getTypeMove(pokemon.Types[0].Type.Name))
 	} else {
-		return nil, fmt.Errorf("pokemon %s has no type data - possible corruption. Please restart.", pokemon.Name)
+		return nil, fmt.Errorf("Pokemon %s has no type data - possible corruption. Please restart.", pokemon.Name)
 	}
     return moves, nil
 }
@@ -282,7 +287,7 @@ func getStatValue(stats []struct {
             return stat.BaseStat, nil
         }
     }
-    return 0, fmt.Errorf("pokemon %s stat not found, data corruption or server error possible. Please restart.", statName)
+    return 0, fmt.Errorf("Pokemon %s stat not found, data corruption or server error possible. Please restart.", statName)
 }
 
 func getAllBattleStats(pokemon pokeapi.BattlePokemon) (map[string]int, error) {

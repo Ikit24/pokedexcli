@@ -109,7 +109,7 @@ func getCommands(cfg *config.Config) map[string]config.CliCommand {
     return map[string]config.CliCommand{
         "help": {
             Name:        "help",
-            Description: "Displays command list",
+            Description: "Displays the command list",
             Callback:    commands.CommandHelp,
         },
         "exit": {
@@ -119,17 +119,17 @@ func getCommands(cfg *config.Config) map[string]config.CliCommand {
         },
         "map": {
             Name:        "map",
-            Description: "Displays the map to explore",
+            Description: "Displays the map of the current area",
             Callback:    commands.CommandMap,
         },
         "mapb": {
             Name:        "mapb",
-            Description: "Displays the previous map list",
+            Description: "Displays the map of the previous area",
             Callback:    commands.CommandMapb,
         },
         "explore": {
             Name:        "explore",
-            Description: "Displays the pokemons in the current area",
+            Description: "Displays the pokemons in the currently explored area",
             Callback:    commands.CommandExplore,
         },
         "catch": {
@@ -139,7 +139,7 @@ func getCommands(cfg *config.Config) map[string]config.CliCommand {
         },
         "inspect": {
             Name:        "inspect",
-            Description: "Displays information about the already captured Pokemons",
+            Description: "Displays information about the Pokemon in your Pokedex",
             Callback:    commands.CommandInspect,
         },
         "pokedex": {

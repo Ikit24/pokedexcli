@@ -61,15 +61,15 @@ func CommandMap(cfg *config.Config, _ []string) error {
 
 func CommandMapb(cfg *config.Config, _ []string) error {
 	if cfg.Previous == "" {
-		fmt.Println("you're on the first page")
+		fmt.Println("You're on the first page")
 		return nil
 	}
 	var body []byte
 	var err error
 
-	cachedData, ok := cfg.Cache.Get(cfg.Next)
+	cachedData, ok := cfg.Cache.Get(cfg.Previous)
 	if !ok {
-		res, httpErr := http.Get(cfg.Next)
+		res, httpErr := http.Get(cfg.Previous)
 		if httpErr != nil {
 			return httpErr
 		}
@@ -78,7 +78,7 @@ func CommandMapb(cfg *config.Config, _ []string) error {
 		if err != nil {
 			return err
 		}
-		cfg.Cache.Add(cfg.Next, body)
+		cfg.Cache.Add(cfg.Previous, body)
 		if res.StatusCode > 299 {
 			return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 		}

@@ -11,7 +11,7 @@ func CommandInspect(cfg *config.Config, pokemon_name []string) error {
 	}
 	p, ok := cfg.Caught[pokemon_name[0]]
 	if ok == false {
-		return fmt.Errorf("you have not caught that pokemon")
+		return fmt.Errorf("You have not yet caught that pokemon")
 	}
 	fmt.Println("Stats:")
 	for _, s := range p.Stats {
