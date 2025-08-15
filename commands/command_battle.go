@@ -87,7 +87,6 @@ func opponentTurn(opponentBattlePokemon, playerBattlePokemon *pokeapi.BattlePoke
 	return nil
 }
 
-
 func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokemon, playerBattlePokemon *pokeapi.BattlePokemon) error {
 	fmt.Printf("You won! If you wish now is the time to capture %s without the chance of them escaping! ", opponentBattlePokemon.Name)
 	playerBattlePokemon.CurrentXP += opponentBattlePokemon.BaseExperience
@@ -109,6 +108,8 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 	} else {
 		cfg.Caught[opponentBattlePokemon.Name] = *opponentBattlePokemon
 		fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
+		saveProgress(cfg)
+		}
 		return nil
 	}
 	return nil
@@ -129,12 +130,10 @@ func CommandBattle(cfg *config.Config, args []string) error {
 	if !ok {
 		return fmt.Errorf("Invalid target")
 	}
-
 	playerPokemonStats, err := getAllBattleStats(pokemon)
 	if err != nil {
 		return err
 	}
-
 	opponentPokemonStats, err := getAllBattleStats(targetPokemon)
 	if err != nil {
 		return err
@@ -219,10 +218,11 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				return nil
 				err = opponentTurn(&opponentBattlePokemon, &playerBattlePokemon, opponentMoves)
 				if err != nil {
-						return err
+					return err
 				}
 				if playerBattlePokemon.CurrentHP <= 0 {
 					fmt.Println("You lost... You walk away defeated")
+					saveProgress(cfg)
 					return nil
 				}
 			}
@@ -233,6 +233,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 			}
 			if playerBattlePokemon.CurrentHP <= 0 {
 				fmt.Println("You lost... You walk away defeated")
+				saveProgress(cfg)
 				return nil
 			}
 			err = playerTurn(&playerBattlePokemon, &opponentBattlePokemon, playerMoves)
@@ -240,15 +241,13 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				return err
 			}
 			if playerBattlePokemon.CurrentHP <= 0 {
-			fmt.Println("You lost... You walk away defeated")
-			return nil
+				fmt.Println("You lost... You walk away defeated")
 			}
-		
 			if opponentBattlePokemon.CurrentHP <= 0 {
 				err := checkVictory(cfg, &opponentBattlePokemon, &playerBattlePokemon)
 				if err != nil {
 					return err
-				}			
+				}
 				return nil
 			}
 		}
@@ -353,4 +352,15 @@ func checkLevelUp(pokemon *pokeapi.BattlePokemon) bool {
 		return true
 	}
 	return false
+}
+
+func saveProgress(cfg *config.Config) {
+	err := cfg.save()
+	if err != nil {
+		fmt.Printf("Save failed, retrying...\n")
+		err = cfg.save()
+		if err != nil {
+			fmt.Printf("Warning: Could not save progress: %v\n", err)
+		}
+	}
 }
