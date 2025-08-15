@@ -87,6 +87,33 @@ func opponentTurn(opponentBattlePokemon, playerBattlePokemon *pokeapi.BattlePoke
 	return nil
 }
 
+
+func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokemon, playerBattlePokemon *pokeapi.BattlePokemon) error {
+	fmt.Printf("You won! If you wish now is the time to capture %s without the chance of them escaping! ", opponentBattlePokemon.Name)
+	playerBattlePokemon.CurrentXP += opponentBattlePokemon.BaseExperience
+
+	fmt.Printf("%s gained %d XP!\n", playerBattlePokemon.Name, opponentBattlePokemon.BaseExperience)
+	checkLevelUp(playerBattlePokemon)
+
+	fmt.Printf("Would you like to capture %s? (y/n):\n", opponentBattlePokemon.Name)
+	reader := bufio.NewReader(os.Stdin)
+	choice, err := reader.ReadString('\n')
+	if err != nil {
+		return fmt.Errorf("Invalid command. Please type 'y' or 'n'")
+	}
+	response := strings.TrimSpace(strings.ToLower(choice))
+	if response == "n" {
+		fmt.Printf("The defeated %s stays free. You won and walk on your path.\n", opponentBattlePokemon.Name)
+	} else if response != "y" {
+		return fmt.Errorf("Invalid response. Please enter y or n")
+	} else {
+		cfg.Caught[opponentBattlePokemon.Name] = *opponentBattlePokemon
+		fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
+		return nil
+	}
+	return nil
+}
+
 func CommandBattle(cfg *config.Config, args []string) error {
 	if len(args) < 2 {
 		return fmt.Errorf("Usage: battle <your-pokemon> <target-pokemon>")
@@ -185,35 +212,19 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				return err
 			}
 			if opponentBattlePokemon.CurrentHP <= 0 {
-				fmt.Printf("You won! If you wish now is the time to capture %s without the chance of them escaping! ", opponentBattlePokemon.Name)
-				playerBattlePokemon.CurrentXP += opponentBattlePokemon.BaseExperience
-				fmt.Printf("%s gained %d XP!\n", playerBattlePokemon.Name, opponentBattlePokemon.BaseExperience)
-				checkLevelUp(&playerBattlePokemon)
-				fmt.Printf("Would you like to capture %s? (y/n):\n", opponentBattlePokemon.Name)
-				reader := bufio.NewReader(os.Stdin)
-				choice, err := reader.ReadString('\n')
+				err := checkVictory(cfg, &opponentBattlePokemon, &playerBattlePokemon)
 				if err != nil {
-					return fmt.Errorf("Invalid command. Please type 'y' or 'n'")
-				}
-				response := strings.TrimSpace(strings.ToLower(choice))
-				if response == "n" {
-					fmt.Printf("The defeated %s stays free. You won and walk on your path.\n", opponentBattlePokemon.Name)
-				} else if response != "y" {
-					return fmt.Errorf("Invalid response. Please enter y or n")
-				} else {
-					cfg.Caught[opponentBattlePokemon.Name] = opponentBattlePokemon
-					fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
-				}
-				return nil
-			}
-
-			err = opponentTurn(&opponentBattlePokemon, &playerBattlePokemon, opponentMoves)
-			if err != nil {
 					return err
-			}
-			if playerBattlePokemon.CurrentHP <= 0 {
-				fmt.Println("You lost... You walk away defeated")
+				}
 				return nil
+				err = opponentTurn(&opponentBattlePokemon, &playerBattlePokemon, opponentMoves)
+				if err != nil {
+						return err
+				}
+				if playerBattlePokemon.CurrentHP <= 0 {
+					fmt.Println("You lost... You walk away defeated")
+					return nil
+				}
 			}
 		} else {
 			err := opponentTurn(&opponentBattlePokemon, &playerBattlePokemon, opponentMoves)
@@ -234,25 +245,10 @@ func CommandBattle(cfg *config.Config, args []string) error {
 			}
 		
 			if opponentBattlePokemon.CurrentHP <= 0 {
-				fmt.Println("You won! If you wish now is the time to capture %s without the chance of them escaping!\n", opponentBattlePokemon.Name)
-				fmt.Println("Please type 'y' or 'n'")
-				playerBattlePokemon.CurrentXP += opponentBattlePokemon.BaseExperience
-				fmt.Printf("%s gained %d XP!\n", playerBattlePokemon.Name, opponentBattlePokemon.BaseExperience)
-				checkLevelUp(&playerBattlePokemon)
-				reader := bufio.NewReader(os.Stdin)
-				choice, err := reader.ReadString('\n')
+				err := checkVictory(cfg, &opponentBattlePokemon, &playerBattlePokemon)
 				if err != nil {
-					return fmt.Errorf("Invalid command. Please type 'y' or 'n'")
-				}
-				response := strings.TrimSpace(strings.ToLower(choice))
-				if response == "n" {
-					fmt.Printf("The defeated %s stays free. You won and walk on your path.\n", opponentBattlePokemon.Name)
-				} else if response != "y" {
-					return fmt.Errorf("Invalid response. Please enter y or n")
-				} else {
-					cfg.Caught[opponentBattlePokemon.Name] = opponentBattlePokemon
-					fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
-				}
+					return err
+				}			
 				return nil
 			}
 		}
