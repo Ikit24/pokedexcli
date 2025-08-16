@@ -108,7 +108,7 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 	} else {
 		cfg.Caught[opponentBattlePokemon.Name] = *opponentBattlePokemon
 		fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
-		saveProgress(cfg)
+		autoSave(cfg)
 		}
 		return nil
 	}
@@ -222,7 +222,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				}
 				if playerBattlePokemon.CurrentHP <= 0 {
 					fmt.Println("You lost... You walk away defeated")
-					saveProgress(cfg)
+					autoSave(cfg)
 					return nil
 				}
 			}
@@ -233,7 +233,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 			}
 			if playerBattlePokemon.CurrentHP <= 0 {
 				fmt.Println("You lost... You walk away defeated")
-				saveProgress(cfg)
+				autoSave(cfg)
 				return nil
 			}
 			err = playerTurn(&playerBattlePokemon, &opponentBattlePokemon, playerMoves)
@@ -313,7 +313,7 @@ func displayBattleComparison(playerStats, opponentStats map[string]int, playerNa
 		playerValue := playerStats[statName]
 		opponentValue := opponentStats[statName]
 
-		fmt.Printf("%-20s %-20s\n", 
+		fmt.Printf("%-20s %-20s\n",
             fmt.Sprintf("%s: %d", strings.Title(statName), playerValue),
             fmt.Sprintf("%s: %d", strings.Title(statName), opponentValue))
 	}
@@ -354,13 +354,18 @@ func checkLevelUp(pokemon *pokeapi.BattlePokemon) bool {
 	return false
 }
 
-func saveProgress(cfg *config.Config) {
-	err := cfg.save()
+func autoSave(cfg *config.Config) error {
+	save, err := json.Marshal(cfg.Caught)
 	if err != nil {
-		fmt.Printf("Save failed, retrying...\n")
-		err = cfg.save()
+		return fmt.Errorf("Error, marshal to JSON failed!")
+	}
+	err = os.WriteFile("pokedex.json", save, 0644)
+	if err != nil {
+		fmt.Println("Autosave failed. Retrying...")
+		err = os.WriteFile("pokedex.json", save, 0644)
 		if err != nil {
 			fmt.Printf("Warning: Could not save progress: %v\n", err)
 		}
 	}
+	return nil
 }

@@ -152,5 +152,10 @@ func getCommands(cfg *config.Config) map[string]config.CliCommand {
             Description: "Initiates a battle by using one of your captured Pokemon and a selected pokemon in the current area",
             Callback:    commands.CommandBattle,
         },
+        "save": {
+            Name:        "save",
+            Description: "Saves current progress",
+            Callback:    commands.CommandBattle,
+        },
     }
 }
