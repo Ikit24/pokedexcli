@@ -11,7 +11,7 @@ import (
     "github.com/eiannone/keyboard"
 )
 
-func startRepl() {
+func startRepl(cfg config.Config) {
     err := keyboard.Open()
     if err != nil {
         panic(err)
@@ -21,7 +21,6 @@ func startRepl() {
     var input_buffer []rune
     var commandHistory []string
     var historyIndex int
-    var cfg config.Config
 
     historyIndex = len(commandHistory)
 

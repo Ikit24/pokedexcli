@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"bufio"
+	"encoding/json"
 	"strings"
 	"os"
 	"strconv"
@@ -109,7 +110,6 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 		cfg.Caught[opponentBattlePokemon.Name] = *opponentBattlePokemon
 		fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
 		autoSave(cfg)
-		}
 		return nil
 	}
 	return nil

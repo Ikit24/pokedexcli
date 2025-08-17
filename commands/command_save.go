@@ -3,10 +3,9 @@ package commands
 import (
 	"fmt"
 	"bufio"
+	"encoding/json"
 	"strings"
 	"os"
-	"strconv"
-	"github.com/Ikit24/pokedexcli/internal/pokeapi"
 	"github.com/Ikit24/pokedexcli/internal/config"
 )
 
