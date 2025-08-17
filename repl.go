@@ -3,9 +3,6 @@ package main
 import (
     "fmt"
     "strings"
-    "time"
-    "github.com/Ikit24/pokedexcli/internal/pokecache"
-    "github.com/Ikit24/pokedexcli/internal/pokeapi"
     "github.com/Ikit24/pokedexcli/internal/config"
     "github.com/Ikit24/pokedexcli/commands"
     "github.com/eiannone/keyboard"
@@ -23,13 +20,6 @@ func startRepl(cfg config.Config) {
     var historyIndex int
 
     historyIndex = len(commandHistory)
-
-    cfg.Next = "https://pokeapi.co/api/v2/location-area/"
-    cfg.Previous = ""
-    cfg.Cache = pokecache.NewCache(1 * time.Minute)
-    cfg.MyMap = getCommands(&cfg)
-    cfg.Caught = make(map[string]pokeapi.BattlePokemon)
-    cfg.Battle = make(map[string]pokeapi.BattlePokemon)
 
     fmt.Print("Pokedex > ")
     for {
@@ -154,7 +144,7 @@ func getCommands(cfg *config.Config) map[string]config.CliCommand {
         "save": {
             Name:        "save",
             Description: "Saves current progress",
-            Callback:    commands.CommandBattle,
+            Callback:    commands.CommandSave,
         },
     }
 }
