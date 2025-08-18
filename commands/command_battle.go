@@ -216,6 +216,8 @@ func CommandBattle(cfg *config.Config, args []string) error {
 					return err
 				}
 				return nil
+			}
+			if opponentBattlePokemon.CurrentHP > 0 {
 				err = opponentTurn(&opponentBattlePokemon, &playerBattlePokemon, opponentMoves)
 				if err != nil {
 					return err

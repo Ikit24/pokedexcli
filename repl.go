@@ -97,54 +97,59 @@ func cleanInput(text string) []string {
 func getCommands(cfg *config.Config) map[string]config.CliCommand {
     return map[string]config.CliCommand{
         "help": {
-            Name:        "help",
-            Description: "Displays the command list",
+            Name:        "- help",
+            Description: "Displays the command list.",
             Callback:    commands.CommandHelp,
         },
         "exit": {
-            Name:        "exit",
-            Description: "Exits the Pokedex",
+            Name:        "- exit",
+            Description: "Exits the Pokedex.",
             Callback:    commands.CommandExit,
         },
         "map": {
-            Name:        "map",
-            Description: "Displays the map of the current area",
+            Name:        "- map",
+            Description: "Displays the map of the current area.",
             Callback:    commands.CommandMap,
         },
         "mapb": {
-            Name:        "mapb",
-            Description: "Displays the map of the previous area",
+            Name:        "- mapb",
+            Description: "Displays the map of the previous area.",
             Callback:    commands.CommandMapb,
         },
         "explore": {
-            Name:        "explore",
-            Description: "Displays the pokemons in the currently explored area",
+            Name:        "- explore",
+            Description: "Displays the pokemons in the currently explored area.",
             Callback:    commands.CommandExplore,
         },
         "catch": {
-            Name:        "catch",
-            Description: "Catches Pokemons and adds them to your Pokedex",
+            Name:        "- catch",
+            Description: "Catches Pokemons and adds them to your Pokedex.",
             Callback:    commands.CommandCatch,
         },
         "inspect": {
-            Name:        "inspect",
-            Description: "Displays information about the Pokemon in your Pokedex",
+            Name:        "- inspect",
+            Description: "Displays information about the Pokemon in your Pokedex.",
             Callback:    commands.CommandInspect,
         },
         "pokedex": {
-            Name:        "pokedex",
-            Description: "List of all the Pokemons that you captured",
+            Name:        "- pokedex",
+            Description: "List of all the Pokemons that you captured.",
             Callback:    commands.CommandPokedex,
         },
         "battle": {
-            Name:        "battle",
-            Description: "Initiates a battle by using one of your captured Pokemon and a selected pokemon in the current area",
+            Name:        "- battle",
+            Description: "Initiates a battle by using one of your captured Pokemon and a selected pokemon in the current area.",
             Callback:    commands.CommandBattle,
         },
         "save": {
-            Name:        "save",
-            Description: "Saves current progress",
+            Name:        "- save",
+            Description: "Saves current progress.",
             Callback:    commands.CommandSave,
+        },
+        "delete": {
+            Name:        "- delete",
+            Description: "Deletes current save file. WARNING! This cannot be undone after executed.",
+            Callback:    commands.CommandDelete,
         },
     }
 }
