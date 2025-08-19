@@ -10,7 +10,7 @@ import (
 )
 
 func CommandMap(cfg *config.Config, _ []string) error {
-	fmt.Println("Fetching locations...")
+	fmt.Println("Fetching locations...\n")
 	var body []byte
 	var err error
 

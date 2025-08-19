@@ -12,7 +12,7 @@ import (
 )
 
 func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemon, playerMoves []Move) error {
-	fmt.Println("Choose your move:")
+	fmt.Println("\nChoose your move:")
 
 	playerAttack, err := getStatValue(playerBattlePokemon.Stats, "attack")
 	if err != nil {
@@ -50,10 +50,11 @@ func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemo
 	if opponentBattlePokemon.CurrentHP < 0 {
 		opponentBattlePokemon.CurrentHP = 0
 	}
-	fmt.Printf("\n%s dealt %d to %s, remaining opponent HP: %d \n", playerBattlePokemon.Name,
-		finalDamage,
-		opponentBattlePokemon.Name,
-		opponentBattlePokemon.CurrentHP)
+	fmt.Printf("\n%s dealt %s to %s, remaining opponent HP: %s \n", 
+		colorize("\033[32m", playerBattlePokemon.Name),
+		colorize("\033[31m", strconv.Itoa(finalDamage)),
+		colorize("\033[35m", opponentBattlePokemon.Name),
+		colorize("\033[34m", strconv.Itoa(opponentBattlePokemon.CurrentHP)))
 	return nil
 }
 
@@ -79,11 +80,12 @@ func opponentTurn(opponentBattlePokemon, playerBattlePokemon *pokeapi.BattlePoke
 	if playerBattlePokemon.CurrentHP < 0 {
 		playerBattlePokemon.CurrentHP = 0
 	}
-	fmt.Printf("%s dealt %d to %s, remaining HP until %s faints: %d ", opponentBattlePokemon.Name,
-	finalOpponentDamage,
-	playerBattlePokemon.Name,
-	playerBattlePokemon.Name,
-	playerBattlePokemon.CurrentHP)
+	fmt.Printf("\n%s dealt %s to %s, remaining HP until %s faints: %s ",
+		colorize("\033[35m", opponentBattlePokemon.Name),
+		colorize("\033[31m", strconv.Itoa(finalOpponentDamage)),
+		colorize("\033[32m", playerBattlePokemon.Name),
+		colorize("\033[32m", playerBattlePokemon.Name),
+		colorize("\033[33m", strconv.Itoa(playerBattlePokemon.CurrentHP)))
 	fmt.Println()
 	return nil
 }
@@ -94,6 +96,7 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 
 	fmt.Printf("%s gained %d XP!\n", playerBattlePokemon.Name, opponentBattlePokemon.BaseExperience)
 	checkLevelUp(playerBattlePokemon)
+	cfg.Caught[playerBattlePokemon.Name] = *playerBattlePokemon
 
 	fmt.Printf("Would you like to capture %s? (y/n):\n", opponentBattlePokemon.Name)
 	reader := bufio.NewReader(os.Stdin)
@@ -177,8 +180,9 @@ func CommandBattle(cfg *config.Config, args []string) error {
 	}
 	playerBattlePokemon.CurrentHP = playerMaxHP
 	playerBattlePokemon.StatusEffects = []string{}
-	playerBattlePokemon.CurrentXP = 0
-	playerBattlePokemon.Level = 1
+	if playerBattlePokemon.CurrentXP == 0 && playerBattlePokemon.Level == 0 {
+		playerBattlePokemon.Level = 1
+	}
 
 	opponentMaxHP, err := getStatValue(opponentBattlePokemon.Stats, "hp")
 	if err != nil {
@@ -370,4 +374,8 @@ func autoSave(cfg *config.Config) error {
 		}
 	}
 	return nil
+}
+
+func colorize(color, text string) string {
+	return color + text + "\033[0m"
 }
