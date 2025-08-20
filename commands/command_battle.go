@@ -12,8 +12,6 @@ import (
 )
 
 func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemon, playerMoves []Move) error {
-	fmt.Println("\nChoose your move:")
-
 	playerAttack, err := getStatValue(playerBattlePokemon.Stats, "attack")
 	if err != nil {
 		return fmt.Errorf("Error getting player attack")
@@ -23,27 +21,41 @@ func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemo
 		return fmt.Errorf("Error getting opponent defense")
 	}
 
-	for i, move := range playerMoves {
-		fmt.Printf("%d. %s\n", i+1, move.Name)
-	}
-	playerInput := bufio.NewReader(os.Stdin)
-	choice, err := playerInput.ReadString('\n')
-	if err != nil {
-		return fmt.Errorf("Invalid input")
-	}
-	response := strings.TrimSpace(strings.ToLower(choice))
+	var chosenMove Move
 
-	if len(response) == 0 {
-		return fmt.Errorf("Please enter a number")
-	}
-	choiceNum, err := strconv.Atoi(response)
-	if err != nil {
-		return fmt.Errorf("Please enter a number")
-	} else if choiceNum < 1 || choiceNum > len(playerMoves) {
-		return fmt.Errorf("Please enter the number between 1 and  %d", len(playerMoves))
+	for {
+		fmt.Println("\nChoose your move::")
+		for i, move := range playerMoves {
+			fmt.Printf("%d. %s\n", i+1, move.Name)
+		}
+
+		playerInput := bufio.NewReader(os.Stdin)
+		choice, err := playerInput.ReadString('\n')
+		if err != nil {
+			fmt.Println("Invalid input. Please try again.")
+			continue
+		}
+
+		response := strings.TrimSpace(strings.ToLower(choice))
+		if len(response) == 0 {
+			fmt.Println("Please enter a number.")
+			continue
+		}
+
+		choiceNum, err := strconv.Atoi(response)
+		if err != nil {
+			fmt.Println("Please enter a valid number.")
+			continue
+		}
+
+		if choiceNum < 1 || choiceNum > len(playerMoves) {
+			fmt.Printf("Please enter the number between 1 and  %d.\n", len(playerMoves))
+			continue
+		}
+		chosenMove = playerMoves[choiceNum - 1]
+		break
 	}
 
-	chosenMove := playerMoves[choiceNum - 1]
 	damage := (playerAttack * chosenMove.Power) / (opponentDefense * 2)
 	finalDamage := int(damage)
 	opponentBattlePokemon.CurrentHP -= finalDamage
@@ -91,11 +103,12 @@ func opponentTurn(opponentBattlePokemon, playerBattlePokemon *pokeapi.BattlePoke
 }
 
 func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokemon, playerBattlePokemon *pokeapi.BattlePokemon) error {
-	fmt.Printf("You won! If you wish now is the time to capture %s without the chance of them escaping! ", opponentBattlePokemon.Name)
-	playerBattlePokemon.CurrentXP += opponentBattlePokemon.BaseExperience
+    fmt.Printf("You won! If you wish now is the time to capture %s without the chance of them escaping! ", opponentBattlePokemon.Name)
+    playerBattlePokemon.CurrentXP += opponentBattlePokemon.BaseExperience
 
-	fmt.Printf("%s gained %d XP!\n", playerBattlePokemon.Name, opponentBattlePokemon.BaseExperience)
-	checkLevelUp(playerBattlePokemon)
+    fmt.Printf("%s gained %d XP!\n", playerBattlePokemon.Name, opponentBattlePokemon.BaseExperience)
+    checkLevelUp(playerBattlePokemon)
+
 	cfg.Caught[playerBattlePokemon.Name] = *playerBattlePokemon
 
 	fmt.Printf("Would you like to capture %s? (y/n):\n", opponentBattlePokemon.Name)
@@ -107,6 +120,7 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 	response := strings.TrimSpace(strings.ToLower(choice))
 	if response == "n" {
 		fmt.Printf("The defeated %s stays free. You won and walk on your path.\n", opponentBattlePokemon.Name)
+		autoSave(cfg)
 	} else if response != "y" {
 		return fmt.Errorf("Invalid response. Please enter y or n")
 	} else {
@@ -144,19 +158,24 @@ func CommandBattle(cfg *config.Config, args []string) error {
 
 	displayBattleComparison(playerPokemonStats, opponentPokemonStats, pokemon.Name, targetPokemon.Name)
 	fmt.Println()
-	fmt.Println("Proceed with battle? (y/n): ")
-	reader := bufio.NewReader(os.Stdin)
-    line, err := reader.ReadString('\n')
-    if err != nil {
-        return fmt.Errorf("Invalid command")
-	}
-	response := strings.TrimSpace(strings.ToLower(line))
-	if response == "n" || response == "no" {
-		fmt.Println("Battle cancelled.")
-		return nil
-	}
-	if response != "y" && response != "yes" {
-		return fmt.Errorf("Invalid response. Please enter y or n")
+	for {
+		fmt.Println("Proceed with battle? (y/n): ")
+		reader := bufio.NewReader(os.Stdin)
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Invalid input. Please try again.")
+			continue
+		}
+
+		response := strings.TrimSpace(strings.ToLower(line))
+
+		if response == "n" || response == "no" {
+			fmt.Println("Battle cancelled.")
+			return nil
+		}
+		if response == "y" || response == "yes" {
+			break
+		}
 	}
 	fmt.Println("Battle begins!")
 	fmt.Println()

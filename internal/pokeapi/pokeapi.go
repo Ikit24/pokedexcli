@@ -53,8 +53,8 @@ type BattlePokemon struct {
         } `json:"move"`
     } `json:"moves"`
  
-    CurrentHP    int      `json:"-"`
-    StatusEffects []string `json:"-"`
-    CurrentXP    int      `json:"-"`
-    Level        int      `json:"-"`
+    CurrentHP    int      `json:"current_hp"`
+    StatusEffects []string `json:"status_effects"`
+    CurrentXP    int      `json:"current_xp"`
+    Level        int      `json:"level"`
 }
