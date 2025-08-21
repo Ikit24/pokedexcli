@@ -103,15 +103,17 @@ func opponentTurn(opponentBattlePokemon, playerBattlePokemon *pokeapi.BattlePoke
 }
 
 func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokemon, playerBattlePokemon *pokeapi.BattlePokemon) error {
-    fmt.Printf("You won! If you wish now is the time to capture %s without the chance of them escaping! ", opponentBattlePokemon.Name)
+    fmt.Printf("You won! If you wish now is the time to capture %s without the chance of them escaping! ", colorize("\033[35m", opponentBattlePokemon.Name))
     playerBattlePokemon.CurrentXP += opponentBattlePokemon.BaseExperience
 
-    fmt.Printf("%s gained %d XP!\n", playerBattlePokemon.Name, opponentBattlePokemon.BaseExperience)
+    fmt.Printf("%s gained %s XP!\n",
+		colorize("\033[32m", playerBattlePokemon.Name),
+		colorize("\033[36m", strconv.Itoa(opponentBattlePokemon.BaseExperience)))
     checkLevelUp(playerBattlePokemon)
 
 	cfg.Caught[playerBattlePokemon.Name] = *playerBattlePokemon
 
-	fmt.Printf("Would you like to capture %s? (y/n):\n", opponentBattlePokemon.Name)
+	fmt.Printf("Would you like to capture %s? (y/n):\n", colorize("\033[35m", opponentBattlePokemon.Name))
 	reader := bufio.NewReader(os.Stdin)
 	choice, err := reader.ReadString('\n')
 	if err != nil {
@@ -119,13 +121,13 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 	}
 	response := strings.TrimSpace(strings.ToLower(choice))
 	if response == "n" {
-		fmt.Printf("The defeated %s stays free. You won and walk on your path.\n", opponentBattlePokemon.Name)
+		fmt.Printf("The defeated %s stays free. You won and walk on your path.\n", colorize("\033[35m", opponentBattlePokemon.Name))
 		autoSave(cfg)
 	} else if response != "y" {
 		return fmt.Errorf("Invalid response. Please enter y or n")
 	} else {
 		cfg.Caught[opponentBattlePokemon.Name] = *opponentBattlePokemon
-		fmt.Printf("You caught %s!\n", opponentBattlePokemon.Name)
+		fmt.Printf("You caught %s!\n", colorize("\033[35m", opponentBattlePokemon.Name))
 		autoSave(cfg)
 		return nil
 	}
@@ -357,22 +359,24 @@ func getTypeMove(pokemonType string) Move {
 	}
 }
 
-func getXPForLevel(level int) int {
+func GetXPForLevel(level int) int {
 	return level * level * level
 }
 
-func getLevelFromXP(currentXP int) int {
+func GetLevelFromXP(currentXP int) int {
 	level := 1
-	for getXPForLevel(level+1) <= currentXP {
+	for GetXPForLevel(level+1) <= currentXP {
 		level++
 	}
 	return level
 }
 
 func checkLevelUp(pokemon *pokeapi.BattlePokemon) bool {
-	newLevel := getLevelFromXP(pokemon.CurrentXP)
+	newLevel := GetLevelFromXP(pokemon.CurrentXP)
 	if newLevel > pokemon.Level {
-		fmt.Printf("%s leveled up! Now level %d\n", pokemon.Name, newLevel)
+		fmt.Printf("%s leveled up! Now level %s\n",
+			colorize("\033[32m", pokemon.Name),
+			colorize("\033[36m", strconv.Itoa(newLevel)))
 		pokemon.Level = newLevel
 		return true
 	}

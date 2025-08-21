@@ -13,13 +13,17 @@ func CommandInspect(cfg *config.Config, pokemon_name []string) error {
 	if ok == false {
 		return fmt.Errorf("You have not yet caught that pokemon")
 	}
-	fmt.Println("Stats:")
+	fmt.Println("\nStats:")
 	for _, s := range p.Stats {
 		fmt.Printf(" -%s: %d\n", s.Stat.Name, s.BaseStat)
 	}
-	fmt.Println("Types:")
+	fmt.Println("\nTypes:")
 	for _, t:= range p.Types {
 		fmt.Println(" - " + t.Type.Name)
 	}
+
+	currentLevel := GetLevelFromXP(p.CurrentXP)
+	fmt.Printf("\nLevel: %d\n", currentLevel)
+	fmt.Printf("Current XP: %d\n", p.CurrentXP)
 	return nil
 }
