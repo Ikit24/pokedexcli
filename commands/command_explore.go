@@ -10,6 +10,10 @@ import(
 )
 
 func CommandExplore(cfg *config.Config, location_area_name []string) error {
+	if cfg.Next == "" || cfg.Next == "https://pokeapi.co/api/v2/location-area/" {
+		return fmt.Errorf("You must map the area first! Use the 'map' command.")
+	}
+
 	if len(location_area_name) == 0 {
 		return fmt.Errorf("Must provide location area name!")
 	}

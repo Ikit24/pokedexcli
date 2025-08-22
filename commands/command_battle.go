@@ -121,7 +121,7 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 	}
 	response := strings.TrimSpace(strings.ToLower(choice))
 	if response == "n" {
-		fmt.Printf("The defeated %s stays free. You won and walk on your path.\n", colorize("\033[35m", opponentBattlePokemon.Name))
+		fmt.Printf("The defeated %s stays free.\n", colorize("\033[35m", opponentBattlePokemon.Name))
 		autoSave(cfg)
 	} else if response != "y" {
 		return fmt.Errorf("Invalid response. Please enter y or n")
@@ -365,18 +365,30 @@ func GetXPForLevel(level int) int {
 
 func GetLevelFromXP(currentXP int) int {
 	level := 1
-	for GetXPForLevel(level+1) <= currentXP {
+	for GetXPForLevel(level+1) <= currentXP && level < 100 {
 		level++
 	}
 	return level
 }
 
 func checkLevelUp(pokemon *pokeapi.BattlePokemon) bool {
+	if pokemon.Level >= 100 {
+		fmt.Printf("%s is already at max level (100)!\n", colorize("\033[32m", pokemon.Name))
+		return false
+	}
+
 	newLevel := GetLevelFromXP(pokemon.CurrentXP)
 	if newLevel > pokemon.Level {
+		if newLevel > 100 {
+			newLevel = 100
+		}
+
 		fmt.Printf("%s leveled up! Now level %s\n",
 			colorize("\033[32m", pokemon.Name),
 			colorize("\033[36m", strconv.Itoa(newLevel)))
+		if newLevel == 100 {
+			fmt.Printf("%s has reached the maximum level!\n", colorize("\033[32m", pokemon.Name))
+		}
 		pokemon.Level = newLevel
 		return true
 	}
