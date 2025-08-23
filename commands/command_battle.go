@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
 	"github.com/Ikit24/pokedexcli/internal/config"
+	"math/rand"
 )
 
 func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemon, playerMoves []Move) error {
@@ -110,6 +111,7 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 		colorize("\033[32m", playerBattlePokemon.Name),
 		colorize("\033[36m", strconv.Itoa(opponentBattlePokemon.BaseExperience)))
     checkLevelUp(playerBattlePokemon)
+	givePartyXP(cfg, opponentBattlePokemon.BaseExperience)
 
 	cfg.Caught[playerBattlePokemon.Name] = *playerBattlePokemon
 
@@ -386,6 +388,9 @@ func checkLevelUp(pokemon *pokeapi.BattlePokemon) bool {
 		fmt.Printf("%s leveled up! Now level %s\n",
 			colorize("\033[32m", pokemon.Name),
 			colorize("\033[36m", strconv.Itoa(newLevel)))
+		
+		levelUpStats(pokemon)
+
 		if newLevel == 100 {
 			fmt.Printf("%s has reached the maximum level!\n", colorize("\033[32m", pokemon.Name))
 		}
@@ -413,4 +418,19 @@ func autoSave(cfg *config.Config) error {
 
 func colorize(color, text string) string {
 	return color + text + "\033[0m"
+}
+
+func levelUpStats(pokemon *pokeapi.BattlePokemon) {
+	for i := range pokemon.Stats{
+		increase := pokemon.Stats[i].BaseStat * (rand.Intn(2) + 2) / 100
+		pokemon.Stats[i].BaseStat += increase
+	}
+}
+
+func givePartyXP(cfg *config.Config, baseXP int) {
+	for name, pokemon := range cfg.Caught {
+		pokemon.CurrentXP += baseXP / 5 
+		checkLevelUp(&pokemon)
+		cfg.Caught[name] = pokemon
+	}
 }
