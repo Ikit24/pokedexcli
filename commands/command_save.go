@@ -13,10 +13,16 @@ func CommandSave(cfg *config.Config, args []string) error {
 	if len(args) > 0 {
 		return fmt.Errorf("Usage: save (without arguments)")
 	}
-	save, err := json.Marshal(cfg.Caught)
+
+	saveData := map[string]interface{} {
+		"caught":         cfg.Caught,
+		"explored_areas": cfg.ExploredAreas,
+	}
+	save, err := json.Marshal(saveData)
 	if err != nil {
 		return fmt.Errorf("Error, marshal to JSON failed!")
 	}
+
 	err = os.WriteFile("pokedex.json", save, 0644)
 	if err != nil {
 		fmt.Println("Save failed! Retry? (y/n):")

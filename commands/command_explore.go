@@ -80,6 +80,28 @@ func CommandExplore(cfg *config.Config, location_area_name []string) error {
 		cfg.Battle[pokemonName] = pokemonResponse
 	}
 	fmt.Println("Exploring", location_area_name[0], "...")
+
+	areaName := location_area_name[0]
+	isNewArea := true
+	for _, exploredArea := range cfg.ExploredAreas {
+		if exploredArea == areaName {
+			isNewArea = false
+			break
+		}
+	}
+
+	xpAmount := 2
+	if isNewArea {
+		xpAmount = 5 
+		cfg.ExploredAreas = append(cfg.ExploredAreas, areaName)
+	}
+
+	for name, pokemon := range cfg.Caught {
+		pokemon.CurrentXP += xpAmount
+		checkLevelUp(&pokemon)
+		cfg.Caught[name] = pokemon
+	}
+
 	fmt.Println()
 	fmt.Println("Found Pokemon:")
 
