@@ -74,3 +74,32 @@ func CommandCatch(cfg *config.Config, pokemonName []string) error {
 	}
 	return nil
 }
+
+func choosePokeBall(balls pokeapi.BattlePokemon) ([]PokeBallTypes, error) {
+	balls := []PokeBallTypes{}
+
+	pokeBall, err := getPokeBalls(balls.PokeBalls, "balltype")
+	if err != nil {
+		return nil, fmt.Errorf("Cannot fetch Pokeballs.")
+	}
+	balls = append(balls, Balls {
+		Name: "Pokeballs",
+		Chance: 50 + (pokeBall / 10),
+	})
+
+	return balls, nil
+}
+
+type PokeBallTypes struct {
+	Name        []string
+	Description string
+	Type        []string
+	BaseChance	int
+}
+
+func getPokeBalls(stats []struct {
+	Name	   []string
+	BaseChance int `json:"base_chance"`
+	BallType   string `json: "name"`
+
+}
