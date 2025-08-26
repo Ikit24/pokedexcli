@@ -75,31 +75,32 @@ func CommandCatch(cfg *config.Config, pokemonName []string) error {
 	return nil
 }
 
-func choosePokeBall(balls pokeapi.BattlePokemon) ([]PokeBallTypes, error) {
-	balls := []PokeBallTypes{}
+type PokeBall struct {
+	Name		string
+	CatchRate	int
+	MinimForAll bool
+}
 
-	pokeBall, err := getPokeBalls(balls.PokeBalls, "balltype")
-	if err != nil {
-		return nil, fmt.Errorf("Cannot fetch Pokeballs.")
+func getPokeBalls() []PokeBall {
+	return []PokeBall{
+		{Name: "Pokeball", CatchRate: 50, MinimForAll: false},
+		{Name: "Great Ball", CatchRate: 75, MinimForAll: false},
+		{Name: "Ultra Ball", CatchRate: 90, MinimForAll: false},
+		{Name: "Master Ball", CatchRate: 100, MinimForAll: true},
 	}
-	balls = append(balls, Balls {
-		Name: "Pokeballs",
-		Chance: 50 + (pokeBall / 10),
-	})
-
-	return balls, nil
 }
 
-type PokeBallTypes struct {
-	Name        []string
-	Description string
-	Type        []string
-	BaseChance	int
-}
+func getValidPokeballs(pokemonBaseExp int) []PokeBall {
+	allBalls := getPokeBalls()
+	validBalls := []PokeBall{}
 
-func getPokeBalls(stats []struct {
-	Name	   []string
-	BaseChance int `json:"base_chance"`
-	BallType   string `json: "name"`
-
+	if pokemonBaseExp <= baseXP_medium {
+		validBalls = allBalls
+	} else if pokemonBaseExp <= baseXP_high {
+		for _, ball := range allBalls {
+			if ball.Name == "Great Ball" || ball.Name == "Ultra Ball" || ball.Name == "Master Ball" {
+				validBalls = append(validBalls, ball)
+			}
+		}
+	}
 }
