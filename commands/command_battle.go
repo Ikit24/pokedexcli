@@ -25,7 +25,7 @@ func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemo
 	var chosenMove Move
 
 	for {
-		fmt.Println("\nChoose your move::")
+		fmt.Println("\nChoose your move:")
 		for i, move := range playerMoves {
 			fmt.Printf("%d. %s\n", i+1, move.Name)
 		}

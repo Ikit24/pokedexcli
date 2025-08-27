@@ -2,12 +2,22 @@ package commands
 
 import (
 	"fmt"
+	"bufio"
 	"io"
+	"os"
 	"net/http"
 	"encoding/json"
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
 	"github.com/Ikit24/pokedexcli/internal/config"
 	"math/rand"
+	"strconv"
+	"strings"
+)
+
+const (
+	baseXP_low		= 100
+	baseXP_medium	= 150
+	baseXP_high		= 300
 )
 
 func CommandCatch(cfg *config.Config, pokemonName []string) error {
@@ -46,22 +56,28 @@ func CommandCatch(cfg *config.Config, pokemonName []string) error {
 		return fmt.Errorf("JSON unmarshal failed: %w", err)
 	}
 
-	fmt.Printf("Throwing a Pokeball at %s...", pokemonName[0])
+	validBalls := getValidPokeballs(apiResponse.BaseExperience)
+	chosenBall := selectPokeball(validBalls)
+
+	fmt.Printf("Throwing a %s at %s...\n", chosenBall.Name, pokemonName[0])
 	fmt.Println()
 
-	var baseXP_low = 100
-	var baseXP_medium = 150
-	var baseXP_high = 300
 	var catch_Chance int
+	var baseCatchRate int
 
 	if apiResponse.BaseExperience <= baseXP_low {
-		catch_Chance = 80
+		baseCatchRate = 80
 	} else if apiResponse.BaseExperience <= baseXP_medium {
-		catch_Chance = 50
+		baseCatchRate = 50
 	} else if apiResponse.BaseExperience <= baseXP_high {
-		catch_Chance = 20
+		baseCatchRate = 20
 	} else {
-		catch_Chance = 5
+		baseCatchRate = 5
+	}
+
+	catch_Chance = int(float64(baseCatchRate) * (float64(chosenBall.CatchRate) / 100.0))
+	if catch_Chance > 100 {
+		catch_Chance = 100
 	}
 
 	randomRoll := rand.Intn(100) + 1
@@ -102,5 +118,50 @@ func getValidPokeballs(pokemonBaseExp int) []PokeBall {
 				validBalls = append(validBalls, ball)
 			}
 		}
+	} else {
+		for _, ball := range allBalls {
+			if ball.Name == "Master Ball" {
+				validBalls = append(validBalls, ball)
+			}
+		}
 	}
+	return validBalls
+}
+
+func selectPokeball(validBalls []PokeBall) PokeBall {
+	var chosenBall PokeBall
+
+	for {
+		fmt.Println("\nChoose a Pokeball:")
+		for i, ball := range validBalls {
+			fmt.Printf("%d. %s\n", i+1, ball.Name)
+		}
+
+		playerInput :=bufio.NewReader(os.Stdin)
+		choice, err := playerInput.ReadString('\n')
+		if err != nil {
+			fmt.Println("Invalid input. Please try again.")
+			continue
+		}
+
+		response := strings.TrimSpace(strings.ToLower(choice))
+		if len(response) == 0 {
+			fmt.Println("Please enter a number.")
+			continue
+		}
+
+		choiceNum, err := strconv.Atoi(response)
+		if err != nil {
+			fmt.Println("Please enter a valid number.")
+			continue
+		}
+
+		if choiceNum < 1 || choiceNum > len(validBalls) {
+			fmt.Printf("Please enter a number between 1 and %d.\n", len(validBalls))
+			continue
+		}
+		chosenBall = validBalls[choiceNum - 1]
+		break
+	}
+	return chosenBall
 }
