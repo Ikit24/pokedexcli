@@ -124,13 +124,13 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 	response := strings.TrimSpace(strings.ToLower(choice))
 	if response == "n" {
 		fmt.Printf("The defeated %s stays free.\n", colorize("\033[35m", opponentBattlePokemon.Name))
-		autoSave(cfg)
+		AutoSave(cfg)
 	} else if response != "y" {
 		return fmt.Errorf("Invalid response. Please enter y or n")
 	} else {
 		cfg.Caught[opponentBattlePokemon.Name] = *opponentBattlePokemon
 		fmt.Printf("You caught %s!\n", colorize("\033[35m", opponentBattlePokemon.Name))
-		autoSave(cfg)
+		AutoSave(cfg)
 		return nil
 	}
 	return nil
@@ -251,7 +251,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				}
 				if playerBattlePokemon.CurrentHP <= 0 {
 					fmt.Println("You lost... You walk away defeated")
-					autoSave(cfg)
+					AutoSave(cfg)
 					return nil
 				}
 			}
@@ -262,7 +262,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 			}
 			if playerBattlePokemon.CurrentHP <= 0 {
 				fmt.Println("You lost... You walk away defeated")
-				autoSave(cfg)
+				AutoSave(cfg)
 				return nil
 			}
 			err = playerTurn(&playerBattlePokemon, &opponentBattlePokemon, playerMoves)
@@ -400,7 +400,7 @@ func checkLevelUp(pokemon *pokeapi.BattlePokemon) bool {
 	return false
 }
 
-func autoSave(cfg *config.Config) error {
+func AutoSave(cfg *config.Config) error {
 	save, err := json.Marshal(cfg.Caught)
 	if err != nil {
 		return fmt.Errorf("Error, marshal to JSON failed!")

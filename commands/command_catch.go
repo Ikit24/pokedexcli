@@ -22,7 +22,7 @@ const (
 
 func CommandCatch(cfg *config.Config, pokemonName []string) error {
 	if len(pokemonName) == 0 {
-		return fmt.Errorf("Must provide pokemon name in order to catch")
+		return fmt.Errorf("Must provide pokemon name in order to catch.")
 	}
 	
 	var catch_URL = "https://pokeapi.co/api/v2/pokemon/" + pokemonName[0] + "/"
@@ -84,7 +84,7 @@ func CommandCatch(cfg *config.Config, pokemonName []string) error {
 	if randomRoll <= catch_Chance {
 		fmt.Printf("%s was caught!\n", pokemonName[0])
 		cfg.Caught[apiResponse.Name] = apiResponse
-		autoSave(cfg)
+		AutoSave(cfg)
 	} else {
 		fmt.Printf("%s escaped!\n", pokemonName[0])
 	}

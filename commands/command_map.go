@@ -9,7 +9,11 @@ import (
 	"github.com/Ikit24/pokedexcli/internal/config"
 )
 
-func CommandMap(cfg *config.Config, _ []string) error {
+func CommandMap(cfg *config.Config, args []string) error {
+	if len(args) > 0 {
+		return fmt.Errorf("map command needs no arguments.")
+	}
+
 	fmt.Println("Fetching locations...\n")
 	var body []byte
 	var err error
@@ -59,7 +63,11 @@ func CommandMap(cfg *config.Config, _ []string) error {
 	return nil
 	}
 
-func CommandMapb(cfg *config.Config, _ []string) error {
+func CommandMapb(cfg *config.Config, args []string) error {
+	if len(args) > 0 {
+		return fmt.Errorf("mapb command needs no arguments.")
+	}
+
 	if cfg.Previous == "" {
 		fmt.Println("You're on the first page")
 		return nil

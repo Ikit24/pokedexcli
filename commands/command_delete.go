@@ -11,13 +11,13 @@ import (
 
 func CommandDelete(cfg *config.Config, args []string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("Usage: delete (without arguments)")
+		return fmt.Errorf("delete command doesn't require any arguments.")
 	}
 	fmt.Println("WARNING! You are about to delete your current save. Are you sure? (y/n):")
 	reader := bufio.NewReader(os.Stdin)
 	choice, err := reader.ReadString('\n')
 	if err != nil {
-		return fmt.Errorf("Invalid command. Please type 'y' or 'n'")
+		return fmt.Errorf("Invalid command. Please type 'y' or 'n'.")
 	}
 	response := strings.TrimSpace(strings.ToLower(choice))
 	if response == "n" {
