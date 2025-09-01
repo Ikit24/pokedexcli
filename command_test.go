@@ -80,3 +80,23 @@ func TestExplore (t *testing.T) {
 		}
 	}
 }
+
+func TestInspect(t *testing.T) {
+	cases := [] struct {
+		input	 []string
+		expected string
+	}{
+		{
+			input: []string{},
+			expected: "Must provide pokemon name in order to display it's details",
+		},
+	}
+
+	for _, c :=  range cases {
+		cfg := &config.Config{}
+		actual := commands.CommandInspect(cfg, c.input)
+		if actual.Error() != c.expected {
+			t.Errorf("Test failed, CommandInspect returned: '%s', expected: '%s'", actual.Error(), c.expected)
+		}
+	}
+}
