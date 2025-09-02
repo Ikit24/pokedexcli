@@ -12,7 +12,7 @@ func CommandExit(cfg *config.Config, args []string) error {
     if len(args) > 0 {
         return fmt.Errorf("exit command doesn't require any arguments.")
     }
-    fmt.Println("You are about to exit. Would you like to save your progress first?")
+    fmt.Println("You are about to exit. Would you like to save your progress first? (y/n) ")
     for {
         reader := bufio.NewReader(os.Stdin)
         choice, err := reader.ReadString('\n')

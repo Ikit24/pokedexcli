@@ -8,7 +8,7 @@ import (
     "github.com/eiannone/keyboard"
 )
 
-func startRepl(cfg config.Config) {
+func startRepl(cfg *config.Config) {
     err := keyboard.Open()
     if err != nil {
         panic(err)
@@ -43,7 +43,7 @@ func startRepl(cfg config.Config) {
                 commandName := words[0]
                 cmd, ok := cfg.MyMap[commandName]
                 if ok {
-                    err := cmd.Callback(&cfg, words[1:])
+                    err := cmd.Callback(cfg, words[1:])
                     if err != nil {
                         fmt.Println(err)
                     }

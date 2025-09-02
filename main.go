@@ -20,8 +20,8 @@ func main() {
 	startRepl(cfg)
 }
 
-func loadOrCreateConfig() (config.Config, error) {
-	var cfg config.Config
+func loadOrCreateConfig() (*config.Config, error) {
+	cfg := &config.Config{}
 
 	save, err := ioutil.ReadFile("pokedex.json")
 	if err != nil {
@@ -46,7 +46,7 @@ func loadOrCreateConfig() (config.Config, error) {
 	cfg.Next = "https://pokeapi.co/api/v2/location-area/"
 	cfg.Previous = ""
 	cfg.Cache = pokecache.NewCache(1 * time.Minute)
-	cfg.MyMap = getCommands(&cfg)
+	cfg.MyMap = getCommands(cfg)
 	cfg.Battle = make(map[string]pokeapi.BattlePokemon)
 
 	return cfg, nil

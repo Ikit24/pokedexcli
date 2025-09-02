@@ -83,6 +83,9 @@ func CommandCatch(cfg *config.Config, pokemonName []string) error {
 	randomRoll := rand.Intn(100) + 1
 	if randomRoll <= catch_Chance {
 		fmt.Printf("%s was caught!\n", pokemonName[0])
+		if cfg.Caught == nil {
+			cfg.Caught = make(map[string]pokeapi.BattlePokemon)
+		}
 		cfg.Caught[apiResponse.Name] = apiResponse
 		AutoSave(cfg)
 	} else {
