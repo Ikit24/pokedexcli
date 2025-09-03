@@ -100,3 +100,22 @@ func TestInspect(t *testing.T) {
 		}
 	}
 }
+
+func TestBattle(t *testing.T) {
+	cases := [] struct {
+		input	 []string
+		expected string
+	}{
+		{
+			input: []string{},
+			expected: "Usage: battle <your-pokemon> <target-pokemon>",
+		},
+	}
+	for _, c :=  range cases {
+		cfg := &config.Config{}
+		actual := commands.CommandBattle(cfg, c.input)
+		if actual.Error() != c.expected {
+			t.Errorf("Test failed, CommandBattle returned: '%s', expected: '%s'", actual.Error(), c.expected)
+		}
+	}
+}
