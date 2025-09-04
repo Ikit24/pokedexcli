@@ -151,5 +151,10 @@ func getCommands(cfg *config.Config) map[string]config.CliCommand {
             Description: "Deletes current save file. WARNING! This cannot be undone after executed.",
             Callback:    commands.CommandDelete,
         },
+        "evolve": {
+            Name:        "- evolve",
+            Description: "Optional evolve chevk.",
+            Callback:    commands.CommandEvolve,
+        },
     }
 }
