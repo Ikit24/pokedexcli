@@ -57,4 +57,28 @@ type BattlePokemon struct {
     StatusEffects []string `json:"status_effects"`
     CurrentXP    int      `json:"current_xp"`
     Level        int      `json:"level"`
+
+    CaughtAt           time.Time `json:"caught_at"`
+    EvolutionDelaySecs int       `json:"evolution_delay_secs"`
+    EvolvesTo          string    `json:"evolves_to"`
+    HasEvolved         bool      `json:"has_evolved"`
+}
+
+type EvolutionChain struct {
+Chain ChainLink `json:"chain"`
+}
+
+type ChainLink struct {
+    Species struct {
+        Name string `json:"name"`
+    } `json:"species"`
+    EvolvesTo []struct {
+        Species struct {
+            Name string `json:"name"`
+        } `json:"species"`
+        EvolutionDetails []struct {
+            MinLevel *int `json:"min_level"`
+        } `json:"evolution_details"`
+        EvolvesTo []ChainLink `json:"evolves_to"`
+    } `json:"evolves_to"`
 }
