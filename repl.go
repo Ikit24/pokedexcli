@@ -153,7 +153,7 @@ func getCommands(cfg *config.Config) map[string]config.CliCommand {
         },
         "evolve": {
             Name:        "- evolve",
-            Description: "Optional evolve chevk.",
+            Description: "Optional evolve check.",
             Callback:    commands.CommandEvolve,
         },
     }
