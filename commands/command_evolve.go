@@ -1,14 +1,33 @@
 package commands
 
-func getJSON(ctx context.Context, client *http.Client, url string, any) error {
-	req, _ := http.NewRequestWirthContext(ctx, http.MethodGet, url, nil)
-	resp, err := client.Do(req)
-	if err != nil {return err}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad status: %s", resp.Status)
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+
+    "github.com/Ikit24/pokedexcli/internal/config"
+)
+func getJSONCached(cfg *config.Config, url string, out any) error {
+	if data, ok := cfg.Cache.Get(url); ok {
+		return json.Unmarshal(data, out)
 	}
-	return json.NewDecoder(resp.Body).Decode(v)
+	res, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode > 299 {
+		return fmt.Errorf("response failed: %d\n%s", res.StatusCode, string(body))
+	}
+
+	cfg.Cache.Add(url,body)
+	return json.Unmarshal(body, out)
 }
 
 func DetermineNextEvolution(ctx context.Context, client *http.Client, speciesName string) (string, int, error) {

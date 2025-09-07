@@ -41,8 +41,8 @@ func CommandMap(cfg *config.Config, args []string) error {
 	var apiResponse pokeapi.LocationAreasResponse
 
 	err = json.Unmarshal(body, &apiResponse)
-	if err != nil {
-		return fmt.Errorf("JSON unmarshal failed: %w", err)
+	if err := getJSONCached(cfg, cfg.Next, &apiResponse); err != nil {
+		return err
 	}
 
 	if apiResponse.Previous == nil {
