@@ -10,6 +10,9 @@ import (
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
 	"github.com/Ikit24/pokedexcli/internal/config"
 	"math/rand"
+	"context"
+	"net/http"
+	"time"
 )
 
 func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemon, playerMoves []Move) error {
@@ -128,8 +131,28 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 	} else if response != "y" {
 		return fmt.Errorf("Invalid response. Please enter y or n")
 	} else {
-		cfg.Caught[opponentBattlePokemon.Name] = *opponentBattlePokemon
+		caught := *opponentBattlePokemon
+		caught.CaughtAt = time.Now().UTC()
+		caught.EvolutionDelaySecs = 3600
+		caught.HasEvolved = false
+
+		next, min, err := DetermineNextEvolution(cfg, caught.Name)
+		if err != nil {
+			fmt.Printf("Warning: could not determine evolution for %s: %v\n", caught.Name, err)
+		}
+		caught.EvolvesTo = next
+		caught.MinLevelForEvolution = min
+
+		cfg.Caught[caught.Name] = caught
 		fmt.Printf("You caught %s!\n", colorize("\033[35m", opponentBattlePokemon.Name))
+
+		evolved, err := RunEvolutionPass(context.Background(), http.DefaultClient, cfg.Caught)
+		if err != nil {
+			fmt.Printf("Evolution check failed: %v\n", err)
+		}
+		for _, msg := range evolved {
+			fmt.Println(msg)
+		}
 		AutoSave(cfg)
 		return nil
 	}
