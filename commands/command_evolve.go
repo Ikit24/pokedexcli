@@ -90,3 +90,10 @@ func findNode(n ChainLink, target string) *ChainLink {
 	}
 	return nil
 }
+
+func ReadyToEvolve(p pokeapi.BattlePokemon, now time.Time) bool {
+    if p.HasEvolved || p.EvolvesTo == "" { return false }
+    if p.Level < p.MinLevelForEvolution { return false }
+    if now.Sub(p.CaughtAt) < time.Duration(p.EvolutionDelaySecs)*time.Second { return false }
+    return true
+}
