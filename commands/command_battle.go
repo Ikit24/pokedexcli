@@ -10,8 +10,6 @@ import (
 	"github.com/Ikit24/pokedexcli/internal/pokeapi"
 	"github.com/Ikit24/pokedexcli/internal/config"
 	"math/rand"
-	"context"
-	"net/http"
 	"time"
 )
 
@@ -146,12 +144,12 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 		cfg.Caught[caught.Name] = caught
 		fmt.Printf("You caught %s!\n", colorize("\033[35m", opponentBattlePokemon.Name))
 
-		evolved, err := RunEvolutionPass(context.Background(), http.DefaultClient, cfg.Caught)
+		msgs, err := RunEvolutionPass(cfg)
 		if err != nil {
 			fmt.Printf("Evolution check failed: %v\n", err)
 		}
-		for _, msg := range evolved {
-			fmt.Println(msg)
+		for _, m := range msgs {
+			fmt.Println(m)
 		}
 		AutoSave(cfg)
 		return nil

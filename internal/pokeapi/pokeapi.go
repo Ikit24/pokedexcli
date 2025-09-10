@@ -1,5 +1,9 @@
 package pokeapi
 
+import (
+    "time"
+)
+
 type LocationAreasResponse struct {
 	Count    int    `json:"count"`
 	Next     string `json:"next"`

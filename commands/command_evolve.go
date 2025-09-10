@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
+	"strings"
+	"time"
     "github.com/Ikit24/pokedexcli/internal/config"
+	"github.com/Ikit24/pokedexcli/internal/pokeapi"
 )
 func getJSONCached(cfg *config.Config, url string, out any) error {
 	if data, ok := cfg.Cache.Get(url); ok {
@@ -16,7 +18,7 @@ func getJSONCached(cfg *config.Config, url string, out any) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -91,9 +93,69 @@ func findNode(n ChainLink, target string) *ChainLink {
 	return nil
 }
 
-func ReadyToEvolve(p pokeapi.BattlePokemon, now time.Time) bool {
+func ReadyToEvolve(p pokeapi.BattlePokemon, now time.Time)   bool {
     if p.HasEvolved || p.EvolvesTo == "" { return false }
     if p.Level < p.MinLevelForEvolution { return false }
     if now.Sub(p.CaughtAt) < time.Duration(p.EvolutionDelaySecs)*time.Second { return false }
     return true
+}
+
+func EvolveTo(cfg *config.Config, p *pokeapi.BattlePokemon, next string) error {
+	if next == "" {
+		return nil
+	}
+	var evolved pokeapi.BattlePokemon
+	pokemonURL := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", strings.ToLower(next))
+	if err := getJSONCached(cfg, pokemonURL, &evolved); err != nil {
+		return err
+	}
+
+	lvl, xp := p.Level, p.CurrentXP
+	status, currHP := p.StatusEffects, p.CurrentHP
+
+	*p = evolved
+	p.Level = lvl
+	p.CurrentXP = xp
+	p.StatusEffects = status
+
+	maxHP, _ := getStatValue(p.Stats, "hp")
+    if currHP > maxHP {
+		currHP = maxHP
+	}
+    p.CurrentHP = currHP
+
+	p.HasEvolved = true
+	p.EvolvesTo = ""
+	p.MinLevelForEvolution = 0
+	return nil
+}
+
+func RunEvolutionPass(cfg *config.Config) ([]string, error) {
+	now := time.Now().UTC()
+	msgs := []string{}
+	toInsert := map[string]pokeapi.BattlePokemon{}
+	toDelete := []string{}
+
+	for key, p := range cfg.Caught {
+		if p.EvolvesTo == "" && !p.HasEvolved {
+			if next, min, err := DetermineNextEvolution(cfg, p.Name); err == nil {
+				p.EvolvesTo, p.MinLevelForEvolution = next, min
+			}
+		}
+		if ReadyToEvolve(p, now) {
+			oldName := p.Name
+			if err := EvolveTo(cfg, &p, p.EvolvesTo); err != nil {
+				return msgs, err
+			}
+			newKey := p.Name
+			toDelete = append(toDelete, key)
+			toInsert[newKey] = p
+			msgs = append(msgs, fmt.Sprintf("%s -> %s", oldName, p.Name))
+		} else {
+			cfg.Caught[key] = p
+		}
+	}
+	for _, k := range toDelete { delete(cfg.Caught, k) }
+	for k, v := range toInsert { cfg.Caught[k] = v }
+	return msgs, nil
 }
