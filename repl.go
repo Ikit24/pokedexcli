@@ -21,6 +21,7 @@ func startRepl(cfg *config.Config) {
 
     historyIndex = len(commandHistory)
 
+    fmt.Print("Welcome to Pokdexcli! If you don't know how to start type 'help'\n")
     fmt.Print("Pokedex > ")
     for {
         char, key, err := keyboard.GetSingleKey()

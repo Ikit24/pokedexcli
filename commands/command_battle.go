@@ -116,43 +116,48 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 
 	cfg.Caught[playerBattlePokemon.Name] = *playerBattlePokemon
 
-	fmt.Printf("Would you like to capture %s? (y/n):\n", colorize("\033[35m", opponentBattlePokemon.Name))
-	reader := bufio.NewReader(os.Stdin)
-	choice, err := reader.ReadString('\n')
-	if err != nil {
-		return fmt.Errorf("Invalid command. Please type 'y' or 'n'")
-	}
-	response := strings.TrimSpace(strings.ToLower(choice))
-	if response == "n" {
-		fmt.Printf("The defeated %s stays free.\n", colorize("\033[35m", opponentBattlePokemon.Name))
-		AutoSave(cfg)
-	} else if response != "y" {
-		return fmt.Errorf("Invalid response. Please enter y or n")
-	} else {
-		caught := *opponentBattlePokemon
-		caught.CaughtAt = time.Now().UTC()
-		caught.EvolutionDelaySecs = 3600
-		caught.HasEvolved = false
-
-		next, min, err := DetermineNextEvolution(cfg, caught.Name)
+	for {
+		fmt.Printf("Would you like to capture %s? (y/n):\n", colorize("\033[35m", opponentBattlePokemon.Name))
+		reader := bufio.NewReader(os.Stdin)
+		choice, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Printf("Warning: could not determine evolution for %s: %v\n", caught.Name, err)
+			fmt.Println("Invalid input. Please try again.")
+			continue
 		}
-		caught.EvolvesTo = next
-		caught.MinLevelForEvolution = min
+		response := strings.TrimSpace(strings.ToLower(choice))
+		if response == "n" {
+			fmt.Printf("The defeated %s stays free.\n", colorize("\033[35m", opponentBattlePokemon.Name))
+			AutoSave(cfg)
+			break
+		} else if response != "y" {
+			fmt.Println("Invalid response. Please enter y or n")
+			continue
+		} else {
+			caught := *opponentBattlePokemon
+			caught.CaughtAt = time.Now().UTC()
+			caught.EvolutionDelaySecs = 3600
+			caught.HasEvolved = false
 
-		cfg.Caught[caught.Name] = caught
-		fmt.Printf("You caught %s!\n", colorize("\033[35m", opponentBattlePokemon.Name))
+			next, min, err := DetermineNextEvolution(cfg, caught.Name)
+			if err != nil {
+				fmt.Printf("Warning: could not determine evolution for %s: %v\n", caught.Name, err)
+			}
+			caught.EvolvesTo = next
+			caught.MinLevelForEvolution = min
 
-		msgs, err := RunEvolutionPass(cfg)
-		if err != nil {
-			fmt.Printf("Evolution check failed: %v\n", err)
+			cfg.Caught[caught.Name] = caught
+			fmt.Printf("You caught %s!\n", colorize("\033[35m", opponentBattlePokemon.Name))
+
+			msgs, err := RunEvolutionPass(cfg)
+			if err != nil {
+				fmt.Printf("Evolution check failed: %v\n", err)
+			}
+			for _, m := range msgs {
+				fmt.Println(m)
+			}
+			AutoSave(cfg)
+			break
 		}
-		for _, m := range msgs {
-			fmt.Println(m)
-		}
-		AutoSave(cfg)
-		return nil
 	}
 	return nil
 }
