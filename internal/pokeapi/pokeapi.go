@@ -66,6 +66,7 @@ type BattlePokemon struct {
     EvolutionDelaySecs int       `json:"evolution_delay_secs"`
     EvolvesTo          string    `json:"evolves_to"`
     HasEvolved         bool      `json:"has_evolved"`
+    MinLevelForEvolution int `json:"min_level_for_evolution"`
 }
 
 type EvolutionChain struct {

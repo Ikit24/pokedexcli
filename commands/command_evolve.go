@@ -82,11 +82,11 @@ func DetermineNextEvolution(cfg *config.Config, speciesName string) (string, int
 }
 
 func findNode(n ChainLink, target string) *ChainLink {
-	if n.Species.Name == target {
+	if strings.ToLower(n.Species.Name) == strings.ToLower(target) {
 		return &n
 	}
 	for i := range n.EvolvesTo {
-		if res := find.Node(n.EvolvesTo[i], target); res != nil {
+		if res := findNode(n.EvolvesTo[i], target); res != nil {
 			return res
 		}
 	}
@@ -158,4 +158,20 @@ func RunEvolutionPass(cfg *config.Config) ([]string, error) {
 	for _, k := range toDelete { delete(cfg.Caught, k) }
 	for k, v := range toInsert { cfg.Caught[k] = v }
 	return msgs, nil
+}
+
+func CommandEvolve(cfg *config.Config, args []string) error {
+	msgs, err := RunEvolutionPass(cfg)
+	if err != nil {
+		return  fmt.Errorf("evolution check failed: %w", err)
+	}
+	if len(msgs) == 0 {
+		fmt.Println("No Pokemon ready to evolve.")
+		return nil
+	}
+	for _, m := range msgs {
+		fmt.Println(m)
+	}
+	AutoSave(cfg)
+	return nil
 }

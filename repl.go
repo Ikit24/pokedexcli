@@ -153,7 +153,7 @@ func getCommands(cfg *config.Config) map[string]config.CliCommand {
         },
         "evolve": {
             Name:        "- evolve",
-            Description: "Optional evolve check.",
+            Description: "Optional evolve check to see if any of your Pokemons evolved outside of battles.",
             Callback:    commands.CommandEvolve,
         },
     }
