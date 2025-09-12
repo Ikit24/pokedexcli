@@ -137,10 +137,10 @@ func selectPokeball(validBalls []PokeBall) PokeBall {
 	for {
 		fmt.Println("\nChoose a Pokeball:")
 		for i, ball := range validBalls {
-			fmt.Printf("%d. %s\n", i+1, ball.Name)
+			fmt.Printf("%d. %s - %d%% base catch chance\n", i+1, ball.Name, ball.CatchRate)
 		}
 
-		playerInput :=bufio.NewReader(os.Stdin)
+		playerInput := bufio.NewReader(os.Stdin)
 		choice, err := playerInput.ReadString('\n')
 		if err != nil {
 			fmt.Println("Invalid input. Please try again.")
