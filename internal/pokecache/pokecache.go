@@ -6,14 +6,14 @@ import (
 )
 
 type Cache struct {
-	data		map[string]cacheEntry
 	sync.Mutex
+	data		map[string]cacheEntry
 	interval	time.Duration
 }
 
 type cacheEntry struct {
-	CreatedAt	time.Time
 	Val			[]byte
+	CreatedAt	time.Time
 }
 
 func NewCache(interval time.Duration) Cache {

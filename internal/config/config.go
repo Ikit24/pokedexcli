@@ -6,13 +6,13 @@ import (
 )
 
 type Config struct {
-    Next          string
-    Previous      string
+    ExploredAreas []string
     MyMap         map[string]CliCommand
-    Cache         pokecache.Cache
     Caught        map[string]pokeapi.BattlePokemon
     Battle        map[string]pokeapi.BattlePokemon
-    ExploredAreas []string
+    Cache         pokecache.Cache
+    Next          string
+    Previous      string
 }
 
 type CliCommand struct {

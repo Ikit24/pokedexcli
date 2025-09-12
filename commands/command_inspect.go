@@ -13,7 +13,8 @@ func CommandInspect(cfg *config.Config, pokemon_name []string) error {
 	if ok == false {
 		return fmt.Errorf("You have not yet caught that pokemon")
 	}
-	fmt.Println("\nStats:")
+	fmt.Println("\nName:",p.Name)
+	fmt.Println("Stats:")
 	for _, s := range p.Stats {
 		fmt.Printf(" -%s: %d\n", s.Stat.Name, s.BaseStat)
 	}

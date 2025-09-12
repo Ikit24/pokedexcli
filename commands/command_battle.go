@@ -291,6 +291,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 				AutoSave(cfg)
 				return nil
 			}
+
 			err = playerTurn(&playerBattlePokemon, &opponentBattlePokemon, playerMoves)
 			if err != nil {
 				return err
