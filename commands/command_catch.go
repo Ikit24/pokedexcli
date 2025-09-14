@@ -22,7 +22,7 @@ const (
 
 func CommandCatch(cfg *config.Config, pokemonName []string) error {
 	if len(pokemonName) == 0 {
-		return fmt.Errorf("Must provide pokemon name in order to catch.")
+		return fmt.Errorf("must provide pokemon name in order to catch.")
 	}
 	
 	var catch_URL = "https://pokeapi.co/api/v2/pokemon/" + pokemonName[0] + "/"
@@ -43,7 +43,7 @@ func CommandCatch(cfg *config.Config, pokemonName []string) error {
 		}
 		cfg.Cache.Add(catch_URL, body)
 		if res.StatusCode > 299 {
-			return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+			return fmt.Errorf("response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 		}
 	} else {
 		body = cachedData

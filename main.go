@@ -14,7 +14,7 @@ import (
 func main() {
 	cfg, err := loadOrCreateConfig()
 	if err != nil {
-		fmt.Printf("Error loading save: %v\n", err)
+		fmt.Printf("error loading save: %v\n", err)
 		return
 	}
 	startRepl(cfg)
@@ -34,7 +34,7 @@ func loadOrCreateConfig() (*config.Config, error) {
 		}
 		err := json.Unmarshal(save, &saveData)
 		if err != nil {
-			fmt.Println("Save file corrupted, creating a new save...")
+			fmt.Println("save file corrupted, creating a new save...")
 			os.Remove("pokedex.json")
 			cfg.Caught = make(map[string]pokeapi.BattlePokemon)
 			cfg.ExploredAreas = []string{}

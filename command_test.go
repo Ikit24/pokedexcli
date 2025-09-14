@@ -24,7 +24,7 @@ func TestExit (t *testing.T) {
 	for _, c := range cases {
 		actual := commands.CommandExit(cfg, c.input)
 		if actual.Error() != c.expected {
-			t.Errorf("Test failed, CommandExit returned: '%s', expected: '%s'", actual.Error(), c.expected)
+			t.Errorf("test failed, CommandExit returned: '%s', expected: '%s'", actual.Error(), c.expected)
 		}
 	}
 }
@@ -38,12 +38,12 @@ func TestExplore (t *testing.T) {
 		{
 			next:	"",
 			input: []string{"explore"},
-			expected: "You must map the area first! Use the 'map' command.",
+			expected: "you must map the area first! use the 'map' command.",
 		},
 		{
 			next:	"https://pokeapi.co/api/v2/location-area/",
 			input: []string{"explore"},
-			expected: "You must map the area first! Use the 'map' command.",
+			expected: "you must map the area first! use the 'map' command.",
 		},
 	}
 
@@ -53,7 +53,7 @@ func TestExplore (t *testing.T) {
 		}
 		actual := commands.CommandExplore(cfg, c.input)
 		if actual.Error() != c.expected {
-			t.Errorf("Test failed, CommandExplore returned: '%s', expected: '%s'", actual.Error(), c.expected)
+			t.Errorf("yest failed, CommandExplore returned: '%s', expected: '%s'", actual.Error(), c.expected)
 		}
 	}
 }
@@ -65,7 +65,7 @@ func TestExplore (t *testing.T) {
 	}{
 		{
 			input: []string{},
-			expected: "Must provide location area name!",
+			expected: "must provide location area name!",
 		},
 	}
 
@@ -76,7 +76,7 @@ func TestExplore (t *testing.T) {
 		}
 		actual := commands.CommandExplore(cfg, c.input)
 		if actual.Error() != c.expected {
-			t.Errorf("Test failed, CommandExplore returned: '%s', expected: '%s'", actual.Error(), c.expected)
+			t.Errorf("test failed, CommandExplore returned: '%s', expected: '%s'", actual.Error(), c.expected)
 		}
 	}
 }
@@ -88,7 +88,7 @@ func TestInspect(t *testing.T) {
 	}{
 		{
 			input: []string{},
-			expected: "Must provide pokemon name in order to display it's details",
+			expected: "must provide pokemon name in order to display it's details",
 		},
 	}
 
@@ -96,7 +96,7 @@ func TestInspect(t *testing.T) {
 		cfg := &config.Config{}
 		actual := commands.CommandInspect(cfg, c.input)
 		if actual.Error() != c.expected {
-			t.Errorf("Test failed, CommandInspect returned: '%s', expected: '%s'", actual.Error(), c.expected)
+			t.Errorf("test failed, CommandInspect returned: '%s', expected: '%s'", actual.Error(), c.expected)
 		}
 	}
 }
@@ -108,14 +108,14 @@ func TestBattle(t *testing.T) {
 	}{
 		{
 			input: []string{},
-			expected: "Usage: battle <your-pokemon> <target-pokemon>",
+			expected: "usage: battle <your-pokemon> <target-pokemon>",
 		},
 	}
 	for _, c :=  range cases {
 		cfg := &config.Config{}
 		actual := commands.CommandBattle(cfg, c.input)
 		if actual.Error() != c.expected {
-			t.Errorf("Test failed, CommandBattle returned: '%s', expected: '%s'", actual.Error(), c.expected)
+			t.Errorf("test failed, CommandBattle returned: '%s', expected: '%s'", actual.Error(), c.expected)
 		}
 	}
 }

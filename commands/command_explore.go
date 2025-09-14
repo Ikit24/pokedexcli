@@ -11,11 +11,11 @@ import(
 
 func CommandExplore(cfg *config.Config, location_area_name []string) error {
 	if cfg.Next == "" || cfg.Next == "https://pokeapi.co/api/v2/location-area/" {
-		return fmt.Errorf("You must map the area first! Use the 'map' command.")
+		return fmt.Errorf("you must map the area first! Use the 'map' command.")
 	}
 
 	if len(location_area_name) == 0 {
-		return fmt.Errorf("Must provide location area name!")
+		return fmt.Errorf("must provide location area name!")
 	}
 	var explore_URL = "https://pokeapi.co/api/v2/location-area/" + location_area_name[0] + "/"
 	fmt.Println("Exploring...")
@@ -36,7 +36,7 @@ func CommandExplore(cfg *config.Config, location_area_name []string) error {
 		}
 		cfg.Cache.Add(explore_URL, body)
 		if res.StatusCode > 299 {
-			return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+			return fmt.Errorf("response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 		}
 	} else {
 		body = cachedData
@@ -66,7 +66,7 @@ func CommandExplore(cfg *config.Config, location_area_name []string) error {
 			}
 			cfg.Cache.Add(specificPokemonURL, body)
 			if res.StatusCode > 299 {
-				return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+				return fmt.Errorf("response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 			}
 		} else {
 			body = cachedPokemonData

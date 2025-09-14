@@ -31,7 +31,7 @@ func CommandMap(cfg *config.Config, args []string) error {
 		}
 		cfg.Cache.Add(cfg.Next, body)
 		if res.StatusCode > 299 {
-			return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+			return fmt.Errorf("response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 		}
 	} else {
 		body = cachedData
@@ -88,7 +88,7 @@ func CommandMapb(cfg *config.Config, args []string) error {
 		}
 		cfg.Cache.Add(cfg.Previous, body)
 		if res.StatusCode > 299 {
-			return fmt.Errorf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
+			return fmt.Errorf("response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
 		}
 	} else {
 		body = cachedData

@@ -11,7 +11,7 @@ import (
 
 func CommandSave(cfg *config.Config, args []string) error {
 	if len(args) > 0 {
-		return fmt.Errorf("Usage: save (without arguments)")
+		return fmt.Errorf("usage: save (without arguments)")
 	}
 
 	saveData := map[string]interface{} {
@@ -20,7 +20,7 @@ func CommandSave(cfg *config.Config, args []string) error {
 	}
 	save, err := json.Marshal(saveData)
 	if err != nil {
-		return fmt.Errorf("Error, marshal to JSON failed!")
+		return fmt.Errorf("error, marshal to JSON failed!")
 	}
 
 	err = os.WriteFile("pokedex.json", save, 0644)
@@ -29,7 +29,7 @@ func CommandSave(cfg *config.Config, args []string) error {
 		reader := bufio.NewReader(os.Stdin)
 		choice, err := reader.ReadString('\n')
 		if err != nil {
-			return fmt.Errorf("Invalid command. Please type 'y' or 'n'")
+			return fmt.Errorf("invalid command. Please type 'y' or 'n'")
 		}
 		response := strings.TrimSpace(strings.ToLower(choice))
 		if response == "n" {

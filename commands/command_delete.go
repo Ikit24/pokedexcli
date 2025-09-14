@@ -17,7 +17,7 @@ func CommandDelete(cfg *config.Config, args []string) error {
 	reader := bufio.NewReader(os.Stdin)
 	choice, err := reader.ReadString('\n')
 	if err != nil {
-		return fmt.Errorf("Invalid command. Please type 'y' or 'n'.")
+		return fmt.Errorf("invalid command. Please type 'y' or 'n'.")
 	}
 	response := strings.TrimSpace(strings.ToLower(choice))
 	if response == "n" {
@@ -27,7 +27,7 @@ func CommandDelete(cfg *config.Config, args []string) error {
 		fmt.Println("Deleting save file...")
 		err = os.Remove("pokedex.json")
 		if err != nil {
-			return fmt.Errorf("Save deletion was unsuccessfull. Please try again later.")
+			return fmt.Errorf("save deletion was unsuccessfull. Please try again later.")
 		}
 		cfg.Caught = make(map[string]pokeapi.BattlePokemon)
 		fmt.Println("Save deleted successfully.")

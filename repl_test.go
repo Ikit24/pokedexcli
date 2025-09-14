@@ -53,19 +53,19 @@ func TestGetCommands(t *testing.T) {
 
 	for _, cmdName := range expectedCommands {
 		if _, exists := commands[cmdName]; !exists {
-			t.Errorf("Expected command '%s' not found", cmdName)
+			t.Errorf("expected command '%s' not found", cmdName)
 		}
 	}
 
 	for cmdName, cmd := range commands {
 		if cmd.Name == "" {
-		t.Errorf("Command '%s' missing Name field", cmdName)
+		t.Errorf("command '%s' missing Name field", cmdName)
 		}
 		if cmd.Name == "" {
-			t.Errorf("Command '%s' missing Description field", cmdName)
+			t.Errorf("command '%s' missing Description field", cmdName)
 		}
 		if cmd.Callback == nil {
-			t.Errorf("Command '%s' missing Callback Field", cmdName)
+			t.Errorf("command '%s' missing Callback Field", cmdName)
 		}
 	}
 }

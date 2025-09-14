@@ -16,11 +16,11 @@ import (
 func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemon, playerMoves []Move) error {
 	playerAttack, err := getStatValue(playerBattlePokemon.Stats, "attack")
 	if err != nil {
-		return fmt.Errorf("Error getting player attack")
+		return fmt.Errorf("error getting player attack")
 	}
 	opponentDefense, err := getStatValue(opponentBattlePokemon.Stats, "defense")
 	if err != nil {
-		return fmt.Errorf("Error getting opponent defense")
+		return fmt.Errorf("error getting opponent defense")
 	}
 
 	var chosenMove Move
@@ -75,11 +75,11 @@ func playerTurn(playerBattlePokemon, opponentBattlePokemon *pokeapi.BattlePokemo
 func opponentTurn(opponentBattlePokemon, playerBattlePokemon *pokeapi.BattlePokemon, opponentMoves []Move) error {
 	opponentAttack, err := getStatValue(opponentBattlePokemon.Stats, "attack")
 	if err != nil {
-		return fmt.Errorf("Error getting opponent attack." )
+		return fmt.Errorf("error getting opponent attack." )
 	}
 	playerDefense, err := getStatValue(playerBattlePokemon.Stats, "defense")
 	if err != nil {
-		return fmt.Errorf("Error getting player defense.")
+		return fmt.Errorf("error getting player defense.")
 	}
 	
 	strongestOpponentMove := opponentMoves[0]
@@ -164,18 +164,18 @@ func checkVictory(cfg *config.Config, opponentBattlePokemon *pokeapi.BattlePokem
 
 func CommandBattle(cfg *config.Config, args []string) error {
 	if len(args) < 2 {
-		return fmt.Errorf("Usage: battle <your-pokemon> <target-pokemon>")
+		return fmt.Errorf("usage: battle <your-pokemon> <target-pokemon>")
 	}
 	pokemonName := args[0]
 	targetName := args[1]
 
 	pokemon, ok := cfg.Caught[pokemonName]
 	if !ok {
-		return fmt.Errorf("Pokemon does not exist in your collection yet.")
+		return fmt.Errorf("pokemon does not exist in your collection yet.")
 	}
 	targetPokemon, ok := cfg.Battle[targetName]
 	if !ok {
-		return fmt.Errorf("Invalid target")
+		return fmt.Errorf("invalid target")
 	}
 	playerPokemonStats, err := getAllBattleStats(pokemon)
 	if err != nil {
@@ -216,16 +216,16 @@ func CommandBattle(cfg *config.Config, args []string) error {
 
 	playerMoves, err := generateBasicMoves(playerBattlePokemon)
 	if err != nil {
-		return fmt.Errorf("Error generating player moves: %w", err)
+		return fmt.Errorf("error generating player moves: %w", err)
 	}
 	opponentMoves, err := generateBasicMoves(opponentBattlePokemon)
 	if err != nil {
-		return fmt.Errorf("Error generating opponent moves: %w", err)
+		return fmt.Errorf("error generating opponent moves: %w", err)
 	}
 
 	playerMaxHP, err := getStatValue(playerBattlePokemon.Stats, "hp")
 	if err != nil {
-		return fmt.Errorf("Error, couldn't initialize player hp. Please try again.")
+		return fmt.Errorf("error, couldn't initialize player hp. Please try again.")
 	}
 	playerBattlePokemon.CurrentHP = playerMaxHP
 	playerBattlePokemon.StatusEffects = []string{}
@@ -235,7 +235,7 @@ func CommandBattle(cfg *config.Config, args []string) error {
 
 	opponentMaxHP, err := getStatValue(opponentBattlePokemon.Stats, "hp")
 	if err != nil {
-		return fmt.Errorf("Error, couldn't initialize opponent hp. Please try again.")
+		return fmt.Errorf("error, couldn't initialize opponent hp. Please try again.")
 	}
 	opponentBattlePokemon.CurrentHP = opponentMaxHP
 	opponentBattlePokemon.StatusEffects = []string{}
@@ -244,12 +244,12 @@ func CommandBattle(cfg *config.Config, args []string) error {
 
 	playerSpeed, err := getStatValue(playerBattlePokemon.Stats, "speed")
 	if err != nil {
-		return fmt.Errorf("Error getting player speed")
+		return fmt.Errorf("error getting player speed")
 	}
 
 	opponentSpeed, err := getStatValue(opponentBattlePokemon.Stats, "speed")
 	if err != nil {
-		return fmt.Errorf("Error getting opponent speed")
+		return fmt.Errorf("error getting opponent speed")
 	}
 	if playerSpeed >= opponentSpeed {
 		fmt.Println("Your Pokemon is faster. You go first!")
@@ -322,7 +322,7 @@ func generateBasicMoves(pokemon pokeapi.BattlePokemon) ([]Move, error) {
  
     attackStat, err := getStatValue(pokemon.Stats, "attack")
 	if err != nil {
-		return nil, fmt.Errorf("Cannot fetch stats")
+		return nil, fmt.Errorf("cannot fetch stats")
 	}
     moves = append(moves, Move{
         Name:     "Tackle",
@@ -332,7 +332,7 @@ func generateBasicMoves(pokemon pokeapi.BattlePokemon) ([]Move, error) {
 	if len(pokemon.Types) > 0 {
 		moves = append(moves, getTypeMove(pokemon.Types[0].Type.Name))
 	} else {
-		return nil, fmt.Errorf("Pokemon %s has no type data - possible corruption. Please restart.", pokemon.Name)
+		return nil, fmt.Errorf("pokemon %s has no type data - possible corruption. Please restart.", pokemon.Name)
 	}
     return moves, nil
 }
@@ -348,7 +348,7 @@ func getStatValue(stats []struct {
             return stat.BaseStat, nil
         }
     }
-    return 0, fmt.Errorf("Pokemon %s stat not found, data corruption or server error possible. Please restart.", statName)
+    return 0, fmt.Errorf("pokemon %s stat not found, data corruption or server error possible. Please restart.", statName)
 }
 
 func getAllBattleStats(pokemon pokeapi.BattlePokemon) (map[string]int, error) {
@@ -430,7 +430,7 @@ func checkLevelUp(pokemon *pokeapi.BattlePokemon) bool {
 func AutoSave(cfg *config.Config) error {
 	save, err := json.Marshal(cfg.Caught)
 	if err != nil {
-		return fmt.Errorf("Error, marshal to JSON failed!")
+		return fmt.Errorf("error, marshal to JSON failed!")
 	}
 	err = os.WriteFile("pokedex.json", save, 0644)
 	if err != nil {

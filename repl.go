@@ -49,7 +49,7 @@ func startRepl(cfg *config.Config) {
                         fmt.Println(err)
                     }
                 } else {
-                    fmt.Println("Unknown command")
+                    fmt.Println("unknown command")
                 }
                 fmt.Println()
 

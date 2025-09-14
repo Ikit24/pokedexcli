@@ -7,11 +7,11 @@ import (
 
 func CommandInspect(cfg *config.Config, pokemon_name []string) error {
 	if len(pokemon_name) == 0 {
-		return fmt.Errorf("Must provide pokemon name in order to display it's details")
+		return fmt.Errorf("must provide pokemon name in order to display it's details")
 	}
 	p, ok := cfg.Caught[pokemon_name[0]]
 	if ok == false {
-		return fmt.Errorf("You have not yet caught that pokemon")
+		return fmt.Errorf("you have not yet caught that pokemon")
 	}
 	fmt.Println("\nName:",p.Name)
 	fmt.Println("Stats:")
