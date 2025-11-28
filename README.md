@@ -18,7 +18,7 @@ To run this Pokedex CLI, ensure you have Go installed on your system.
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-github-username/your-repo-name.git
+   git clone https://github.com/Ikit24/pokedexcli.git
    cd your-repo-name
    ```
 
