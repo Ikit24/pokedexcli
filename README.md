@@ -36,7 +36,8 @@ To run this Pokedex CLI, ensure you have Go installed on your system.
 
 ## Usage
 
-Once the application is running, you will see a `Pokedex >` prompt. Type commands and press `Enter`.
+Once the application is running, you will see a `Pokedex >` prompt.
+Type commands and press `Enter`.
 
 ### Commands:
 
