@@ -48,8 +48,8 @@ Type commands and press `Enter`.
 * `explore <location_area_name>`: Lists the Pokémon found in a specific location area (e.g., `explore oreburgh-mine-1f`).
 * `catch <pokemon_name>`: Attempts to catch a specified Pokémon (e.g., `catch pikachu`).
 * `inspect <pokemon_name>`: Shows detailed information about a Pokémon you've caught (e.g., `inspect charmander`).
-* `pokedex`: Displays a list of all Pokémon currently in your Pokedex.
 * `battle` `<pokemon_name>` `<target_name>`: Initiate turn-based combat with a wild Pokémon.
+* `pokedex`: Displays a list of all Pokémon currently in your Pokedex.
 * `delete : Deltes your save file.
 * `save`: Manually save your current progress to disk.
 * `evolve`: Check if any of your Pokemon are ready to evolve and trigger manual evolution.
